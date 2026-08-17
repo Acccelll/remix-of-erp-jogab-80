@@ -28,6 +28,9 @@ function linha(patch: Partial<FinLinha>): FinLinha {
     desc_centro_custo: patch.desc_centro_custo ?? null,
     centro_custo_tipo: patch.centro_custo_tipo ?? "obra",
     categoria_indireta: patch.categoria_indireta ?? null,
+    cnpj_cpf: patch.cnpj_cpf ?? null,
+    historico: patch.historico ?? null,
+    origem: patch.origem ?? null,
   };
 }
 
