@@ -49,7 +49,7 @@ export const CHART_COLORS = {
   ] as const,
 } as const;
 
-type AppTooltipValue = number | string | Array<number | string>;
+type AppTooltipValue = number | string | readonly (number | string)[];
 type AppTooltipName = number | string;
 type AppTooltipProps = TooltipProps<AppTooltipValue, AppTooltipName>;
 
