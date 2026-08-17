@@ -3,13 +3,18 @@ import { lazy, Suspense, useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 const FinImportar = lazy(() => import("@/pages/financeiro/FinImportar"));
 
-import { useQuery } from "@tanstack/react-query";
-import { Download, Upload } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Download, Upload, Plus, Loader2 } from "lucide-react";
 import {
   OrigemBadge,
   OrigemFilter,
   type OrigemLancamento,
 } from "@/components/financeiro/OrigemBadge";
+import {
+  TituloManualFormDialog,
+  type TituloManualEdicao,
+} from "@/components/financeiro/TituloManualFormDialog";
 import { FeatureGate } from "@/components/common/FeatureGate";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -32,8 +38,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { brl } from "@/lib/billing";
+import { financeiroRepo } from "@/lib/repositories/financeiro";
 import { usePlanoContasLabels } from "@/lib/financeiro-totvs/labels";
 import {
   fetchFinanceiroGeral,
@@ -66,6 +83,8 @@ import {
 import { fmtDataHora } from "@/lib/core/date";
 
 function FinanceiroPage() {
+  const [novoTituloOpen, setNovoTituloOpen] = useState(false);
+
   return (
     <div className="p-6 lg:p-8 space-y-6">
       <header className="flex items-start justify-between gap-4">
@@ -73,26 +92,33 @@ function FinanceiroPage() {
           <h1 className="text-2xl font-semibold">Financeiro</h1>
           <p className="text-sm text-muted-foreground">Confronto TOTVS × ObraFlow.</p>
         </div>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Upload className="h-4 w-4 mr-2" /> Importar TOTVS
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full sm:max-w-4xl overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>Importar dados do TOTVS</SheetTitle>
-            </SheetHeader>
-            <div className="mt-4">
-              <Suspense
-                fallback={<div className="text-sm text-muted-foreground py-8">Carregando…</div>}
-              >
-                <FinImportar />
-              </Suspense>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setNovoTituloOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Novo título
+          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Upload className="h-4 w-4 mr-2" /> Importar TOTVS
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:max-w-4xl overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Importar dados do TOTVS</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">
+                <Suspense
+                  fallback={<div className="text-sm text-muted-foreground py-8">Carregando…</div>}
+                >
+                  <FinImportar />
+                </Suspense>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </header>
+
+      <TituloManualFormDialog open={novoTituloOpen} onOpenChange={setNovoTituloOpen} />
 
       <Tabs defaultValue="geral">
         <TabsList>
@@ -491,6 +517,7 @@ function PrevistoRealizado() {
 
 /* ============== Por natureza ============== */
 function PorNatureza() {
+  const queryClient = useQueryClient();
   const { data: linhas } = useQuery<FinLinha[]>({
     queryKey: finKeys.geral,
     queryFn: fetchFinanceiroGeral,
@@ -500,7 +527,7 @@ function PorNatureza() {
   const [obraFiltro, setObraFiltro] = useState<string>("__todas__");
   const [grupoFiltro, setGrupoFiltro] = useState<string>("__todos__");
   const [statusFiltro, setStatusFiltro] = useState<string>("__todos__");
-  const [origemFiltro, setOrigemFiltro] = useState<"todos" | "totvs" | "sistema">("todos");
+  const [origemFiltro, setOrigemFiltro] = useState<OrigemLancamento | "todos">("todos");
   const [mesIni, setMesIni] = useState("");
   const [mesFim, setMesFim] = useState("");
   const [nivelSel, setNivelSel] = useState<
@@ -510,6 +537,13 @@ function PorNatureza() {
     | null
   >(null);
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [edicaoTitulo, setEdicaoTitulo] = useState<TituloManualEdicao | null>(null);
+  const [baixaAlvo, setBaixaAlvo] = useState<{ ref: number; saldo: number } | null>(null);
+  const [valorBaixa, setValorBaixa] = useState("");
+  const [dataBaixa, setDataBaixa] = useState(() => new Date().toISOString().slice(0, 10));
+  const [cancelarAlvo, setCancelarAlvo] = useState<number | null>(null);
+
   const filtradas = useMemo(() => {
     return (linhas ?? []).filter((l) => {
       if (obraFiltro !== "__todas__") {
@@ -518,15 +552,72 @@ function PorNatureza() {
       }
       if (grupoFiltro !== "__todos__" && l.grupo !== grupoFiltro) return false;
       if (statusFiltro !== "__todos__" && String(l.status_cod) !== statusFiltro) return false;
+      if (origemFiltro !== "todos" && (l.origem ?? "totvs") !== origemFiltro) return false;
       const mes = (l.mes_competencia ?? l.data_vencimento ?? "").slice(0, 7);
       if (mesIni && mes && mes < mesIni) return false;
       if (mesFim && mes && mes > mesFim) return false;
       return true;
     });
-  }, [linhas, obraFiltro, grupoFiltro, statusFiltro, mesIni, mesFim]);
+  }, [linhas, obraFiltro, grupoFiltro, statusFiltro, origemFiltro, mesIni, mesFim]);
 
   const arvore = useMemo(() => porNatureza(filtradas), [filtradas]);
   const { label: rotularNatureza } = usePlanoContasLabels();
+
+  function abrirEdicaoTitulo(refLancamento: number) {
+    const linhasDoTitulo = (linhas ?? []).filter(
+      (l) => l.ref_lancamento === refLancamento && l.origem === "manual",
+    );
+    if (!linhasDoTitulo.length) return;
+    const base = linhasDoTitulo[0];
+    setEdicaoTitulo({
+      ref_lancamento: refLancamento,
+      natureza_tipo: (base.natureza_tipo === 1 ? 1 : 2) as 1 | 2,
+      centro_custo: base.centro_custo ?? "",
+      cnpj_cpf: base.cnpj_cpf ?? null,
+      nome: base.contraparte ?? null,
+      data_emissao: base.data_emissao ?? null,
+      data_vencimento: base.data_vencimento ?? "",
+      historico: base.historico ?? null,
+      rateios: linhasDoTitulo
+        .filter((l) => l.cod_natureza)
+        .map((l) => ({
+          cod_natureza: l.cod_natureza as string,
+          valor_rateio: Number(l.valor_rateio ?? 0),
+        })),
+    });
+    setEditDialogOpen(true);
+  }
+
+  const baixarMutation = useMutation({
+    mutationFn: async () => {
+      if (!baixaAlvo) return;
+      await financeiroRepo.rpcBaixarTituloManual(
+        baixaAlvo.ref,
+        Number(valorBaixa.replace(",", ".")) || 0,
+        dataBaixa,
+      );
+    },
+    onSuccess: () => {
+      toast.success("Baixa registrada.");
+      queryClient.invalidateQueries({ queryKey: finKeys.geral });
+      setBaixaAlvo(null);
+      setValorBaixa("");
+    },
+    onError: (err: any) => toast.error(err?.message ?? String(err)),
+  });
+
+  const cancelarMutation = useMutation({
+    mutationFn: async () => {
+      if (cancelarAlvo == null) return;
+      await financeiroRepo.rpcCancelarTituloManual(cancelarAlvo);
+    },
+    onSuccess: () => {
+      toast.success("Título cancelado.");
+      queryClient.invalidateQueries({ queryKey: finKeys.geral });
+      setCancelarAlvo(null);
+    },
+    onError: (err: any) => toast.error(err?.message ?? String(err)),
+  });
 
   function exportarCsv() {
     const rows = filtradas.map((l) => ({
@@ -538,7 +629,7 @@ function PorNatureza() {
       desc_natureza: l.desc_natureza ?? "",
       ref_lancamento: l.ref_lancamento ?? "",
       contraparte: l.contraparte ?? "",
-      origem: (l as any).origem ?? "totvs",
+      origem: l.origem ?? "totvs",
       status: l.status_label ?? "",
       mes_competencia: (l.mes_competencia ?? "").slice(0, 7),
       valor_rateio: l.valor_rateio ?? 0,
@@ -777,6 +868,7 @@ function PorNatureza() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Ref.</TableHead>
+                        <TableHead>Origem</TableHead>
                         <TableHead>Obra</TableHead>
                         <TableHead>Natureza</TableHead>
                         <TableHead>Contraparte</TableHead>
@@ -784,14 +876,21 @@ function PorNatureza() {
                         <TableHead>Vencimento</TableHead>
                         <TableHead className="text-right">Rateio</TableHead>
                         <TableHead className="text-right">Líquido</TableHead>
+                        <TableHead />
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {items.map((l, i) => {
                         const ol = l as unknown as { obra_codigo?: string | null };
+                        const isManual = l.origem === "manual";
+                        const podeEditarBaixar = isManual && l.status_cod !== 3 && l.status_cod !== 18;
+                        const saldoAberto = Number(l.valor_liquido ?? 0) - Number(l.valor_baixado ?? 0);
                         return (
                           <TableRow key={`${l.ref_lancamento}-${i}`}>
                             <TableCell className="font-mono text-xs">{l.ref_lancamento}</TableCell>
+                            <TableCell>
+                              <OrigemBadge origem={l.origem ?? "totvs"} size="sm" />
+                            </TableCell>
                             <TableCell className="text-xs">{ol.obra_codigo ?? "—"}</TableCell>
                             <TableCell className="text-xs">
                               <span className="font-mono">{l.cod_natureza ?? "—"}</span>
@@ -810,6 +909,45 @@ function PorNatureza() {
                             <TableCell className="text-right">
                               {brl(Number(l.valor_liquido ?? 0))}
                             </TableCell>
+                            <TableCell>
+                              {isManual && l.ref_lancamento != null && (
+                                <div className="flex items-center gap-1">
+                                  {podeEditarBaixar && (
+                                    <>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2 text-xs"
+                                        onClick={() => abrirEdicaoTitulo(l.ref_lancamento as number)}
+                                      >
+                                        Editar
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2 text-xs"
+                                        onClick={() =>
+                                          setBaixaAlvo({
+                                            ref: l.ref_lancamento as number,
+                                            saldo: saldoAberto,
+                                          })
+                                        }
+                                      >
+                                        Baixar
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2 text-xs text-destructive"
+                                        onClick={() => setCancelarAlvo(l.ref_lancamento as number)}
+                                      >
+                                        Cancelar
+                                      </Button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </TableCell>
                           </TableRow>
                         );
                       })}
@@ -821,6 +959,74 @@ function PorNatureza() {
           })()}
         </DialogContent>
       </Dialog>
+
+      <TituloManualFormDialog
+        open={editDialogOpen}
+        onOpenChange={(o) => {
+          setEditDialogOpen(o);
+          if (!o) setEdicaoTitulo(null);
+        }}
+        edicao={edicaoTitulo}
+      />
+
+      <Dialog open={!!baixaAlvo} onOpenChange={(o) => !o && setBaixaAlvo(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Baixar título</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="text-sm text-muted-foreground">
+              Saldo em aberto: {brl(baixaAlvo?.saldo ?? 0)}
+            </div>
+            <div className="space-y-1.5">
+              <Label>Valor da baixa</Label>
+              <Input
+                inputMode="decimal"
+                value={valorBaixa}
+                onChange={(e) => setValorBaixa(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Data da baixa</Label>
+              <Input type="date" value={dataBaixa} onChange={(e) => setDataBaixa(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBaixaAlvo(null)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => baixarMutation.mutate()}
+              disabled={baixarMutation.isPending || !valorBaixa}
+            >
+              {baixarMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Salvando…
+                </>
+              ) : (
+                "Confirmar baixa"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={cancelarAlvo != null} onOpenChange={(o) => !o && setCancelarAlvo(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancelar título</AlertDialogTitle>
+            <AlertDialogDescription>
+              O título será marcado como cancelado. Essa ação não pode ser desfeita pela tela.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Voltar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => cancelarMutation.mutate()}>
+              Confirmar cancelamento
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -39,12 +39,16 @@ const FIN_LINHA_COLS = [
   "mes_competencia",
   "data_vencimento",
   "data_pagamento",
+  "data_emissao",
   "contraparte",
+  "cnpj_cpf",
+  "historico",
   "ref_lancamento",
   "centro_custo",
   "desc_centro_custo",
   "centro_custo_tipo",
   "categoria_indireta",
+  "origem",
 ].join(", ");
 
 async function fetchAllFinanceiroRows(obraId?: string): Promise<FinLinha[]> {

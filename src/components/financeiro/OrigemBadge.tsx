@@ -5,7 +5,7 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-export type OrigemLancamento = "totvs" | "sistema";
+export type OrigemLancamento = "totvs" | "sistema" | "manual";
 
 interface OrigemBadgeProps {
   origem: OrigemLancamento | string;
@@ -22,6 +22,11 @@ const config: Record<string, { label: string; className: string }> = {
     label: "Sistema",
     className:
       "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300",
+  },
+  manual: {
+    label: "Manual",
+    className:
+      "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300",
   },
 };
 
@@ -59,6 +64,7 @@ export function OrigemFilter({ value, onChange }: OrigemFilterProps) {
     { value: "todos", label: "Todas as origens" },
     { value: "totvs", label: "TOTVS" },
     { value: "sistema", label: "Sistema" },
+    { value: "manual", label: "Manual" },
   ];
 
   return (
@@ -74,7 +80,9 @@ export function OrigemFilter({ value, onChange }: OrigemFilterProps) {
                 ? "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/40"
                 : o.value === "sistema"
                   ? "bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/40"
-                  : "bg-primary text-primary-foreground border-primary"
+                  : o.value === "manual"
+                    ? "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/40"
+                    : "bg-primary text-primary-foreground border-primary"
               : "bg-background text-muted-foreground border-border hover:bg-accent",
           )}
         >
