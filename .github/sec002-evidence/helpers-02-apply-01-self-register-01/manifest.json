@@ -1,0 +1,22 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "helpers-02-apply-01-self-register-01",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.self-register-01.spec-01.md",
+  "materialization": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.self-register-01.materialize-01.md",
+  "changed_files": [".github/sec002-evidence/INDEX.md"],
+  "indexed_apply_id": "helpers-02-apply-01",
+  "indexed_manifest": ".github/sec002-evidence/helpers-02-apply-01/manifest.json",
+  "index_row": 31,
+  "index_row_line": "| 31 | helpers-02-apply-01 | .github/sec002-evidence/helpers-02-apply-01/manifest.json | docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.materialize-01.md | v2026-07-12.4 | R58, R95, R127, R130, R131, R132 |",
+  "index_last_updated": "2026-07-12T18:20:00Z",
+  "apply_map_version_preserved": "v2026-07-12.4",
+  "dri_gm": "Cappucceno",
+  "dri_technical": "Lovable",
+  "invariants_verified": ["HSR1", "HSR2", "HSR3", "HSR4", "HSR5", "HSR6", "HSR7", "HSR8", "HSR9", "HSR10"],
+  "hashes": {
+    ".github/sec002-evidence/INDEX.md": "8c67f555624ea2208d02e1702c431c86dba705e5da98fe9f6dff6648298f5d14"
+  },
+  "verifier_gate": "pending R135 (EXPECTED_INDEX_ROWS: 30 -> 31)",
+  "refs": ["R58", "R95", "R127", "R130", "R131", "R132", "R133", "R134"],
+  "created_at": "2026-07-12T18:20:00Z"
+}

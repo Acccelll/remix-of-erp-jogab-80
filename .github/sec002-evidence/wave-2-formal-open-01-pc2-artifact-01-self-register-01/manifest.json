@@ -1,0 +1,15 @@
+{
+  "sec002_apply_id": "wave-2-formal-open-01-pc2-artifact-01-self-register-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc2-scope-01.artifact-01.self-register-01.spec-01.md",
+  "changed_files": [
+    ".github/sec002-evidence/INDEX.md"
+  ],
+  "checks": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC2"
+  ],
+  "hashes": {
+    ".github/sec002-evidence/INDEX.md": "e867528f4ee0c84500a9f716371fa76f4b5c4dc2978828426f0a166835546f67"
+  },
+  "refs": ["R73", "R83", "R94", "R95", "R97", "R105", "R106", "R107", "R108"]
+}

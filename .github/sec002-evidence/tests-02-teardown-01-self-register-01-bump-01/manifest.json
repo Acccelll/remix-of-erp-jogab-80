@@ -1,0 +1,31 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-teardown-01-self-register-01-bump-01",
+  "spec_ref": "R199'",
+  "materialize_ref": "R199'",
+  "kind": "pc4-verifier-bump",
+  "target_file": "scripts/sec002/verify-wave-2-preconditions.mjs",
+  "expected_index_rows_before": 44,
+  "expected_index_rows_after": 45,
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "refs": ["R132", "R183", "R192b", "R195'", "R196'", "R197'", "R198'"],
+  "invariants_applied": [
+    "TDR01B-1",
+    "TDR01B-2",
+    "TDR01B-3",
+    "TDR01B-4",
+    "TDR01B-5",
+    "TDR01B-6",
+    "TDR01B-7",
+    "TDR01B-8"
+  ],
+  "not_touched": [
+    ".github/sec002-evidence/INDEX.md",
+    "supabase/tests/",
+    "supabase/migrations/",
+    "src/",
+    ".github/workflows/",
+    "docs/modernizacao/EXECUCAO/07_APPLY_MAP.md"
+  ]
+}

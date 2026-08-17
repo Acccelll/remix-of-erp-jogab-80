@@ -1,0 +1,27 @@
+{
+  "apply_id": "SEC-002.wave-2-formal-open-01.pc5-scope-01.guards-status-01.materialize-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc5-scope-01.guards-status-01.materialize-01.md",
+  "changed_files": [
+    ".github/sec002-guards-status.json",
+    ".github/sec002-evidence/wave-2-formal-open-01-pc5-guards-status-01/manifest.json",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc5-scope-01.guards-status-01.materialize-01.md",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.README.md"
+  ],
+  "checks": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC5",
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC1,PC2,PC3,PC4,PC5"
+  ],
+  "refs": [
+    "R97",
+    "R116",
+    "R117",
+    "R118",
+    "R119"
+  ],
+  "notes": [
+    "Materialização do artefato documental de status verde dos guards para E_WAVE2_PC5.",
+    "Sem alteração em verificador, INDEX.md, apply-map, workflows, frontend ou backend.",
+    "Onda 2 permanece bloqueada por PC6-PC7."
+  ]
+}

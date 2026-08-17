@@ -1,0 +1,49 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-suite-apply-01",
+  "changeset_spec": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.tests-02-suite.apply-01.spec-01.md",
+  "changeset_materialize": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.tests-02-suite.apply-01.materialize-01.md",
+  "source_contract": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.tests-02.suite.spec-01.md",
+  "materialization": {
+    "root": "supabase/tests/sec-002/",
+    "runner": "scripts/db/run-sec-002-tests.sh",
+    "auto_executed": false,
+    "requires_staging_flag": "SEC002_ALLOW_STAGING=1"
+  },
+  "wave": 2,
+  "wave_status": "OPEN",
+  "verifier_gate": "on",
+  "expected_index_rows_at_apply": 31,
+  "helper_asserts": {
+    "user_in_empresa": 3,
+    "user_in_obra": 3,
+    "user_in_board": 4,
+    "user_in_card": 5,
+    "total": 15
+  },
+  "hashes": {
+    "supabase/tests/sec-002/README.md": "e0ce5c1a90034715c00b97bfa05e3f4973cae5e311bb24a4d03fcffa0d9d3e0f",
+    "supabase/tests/sec-002/_lib/fixtures.sql": "e21923a1168cb249ffc6b2d99b8e46def785ea6ce7da4667a4c023133c06c95f",
+    "supabase/tests/sec-002/_lib/jwt.sql": "b1eef646fb5976c4fd61fca6569df89ac7e7898d62b06ad0c934913d62a50b9a",
+    "supabase/tests/sec-002/_lib/assert.sql": "e531c621d872318d91cf47c28dc6f919983ccd68b0c4bff0db42af257b92b9b1",
+    "supabase/tests/sec-002/_lib/teardown.sql": "48591eff4bfa67447b332039b29f1f5ec2e5593ad0b538acfc517af8efb9b986",
+    "supabase/tests/sec-002/helpers/user_in_empresa.sql": "6c178669aed8e6f9f33c3fcef8ba233388ae57e0232ff7aa10b68cad959f1687",
+    "supabase/tests/sec-002/helpers/user_in_obra.sql": "c24408ce3eff5dc292100b04d61644bbc112c2989d12d897382154d162c92b97",
+    "supabase/tests/sec-002/helpers/user_in_board.sql": "9acbafc227fce6321466b635e8e16a4710cad50a96c2e7d45af4e1bee23aae89",
+    "supabase/tests/sec-002/helpers/user_in_card.sql": "74aa1f91dc1a0ee4d6a836858c70749036b084e4516c30ce888fe284f479a308",
+    "scripts/db/run-sec-002-tests.sh": "50f35135de7d56b65b5ae7ed607af542417c72a5c0d4abd5c51326b53d5ed16b"
+  },
+  "invariants_verified": [
+    "AT1", "AT2", "AT3", "AT4", "AT5", "AT6", "AT7",
+    "AT8", "AT9", "AT10", "AT11", "AT12", "AT13", "AT14"
+  ],
+  "dri": {
+    "gm": "Cappucceno",
+    "tecnico": "Lovable"
+  },
+  "refs": ["R22", "R95", "R127", "R132", "R134", "R136", "R137", "R138"],
+  "index_row": null,
+  "index_row_delegated_to": "R139/R140 (self-register-01)",
+  "verifier_bump_delegated_to": "R141/R142 (EXPECTED_INDEX_ROWS: 31 -> 32)",
+  "produced_at": "2026-07-12T18:36:00Z"
+}

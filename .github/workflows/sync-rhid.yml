@@ -1,0 +1,61 @@
+name: Sync RHiD (ponto)
+
+# Sincronização incremental do ponto com a RHiD.
+#
+# Janela curta de propósito: `/apuracao_ponto` é por pessoa (não há consulta em
+# lote), então reprocessar o mês inteiro todo dia multiplica chamadas sem ganho.
+# O fechamento de competência continua sendo feito na tela, pelo período cheio.
+#
+# Secrets necessários no repositório:
+#   VITE_API_URL         — URL do api.php (ex.: https://jogab.com.br/api.php)
+#   SUPABASE_URL         — URL do projeto Supabase
+#   SUPABASE_ANON_KEY    — chave anon (a function valida a origem e usa os
+#                          secrets RHID_* do backend; nenhuma credencial da
+#                          RHiD passa por aqui)
+
+on:
+  schedule:
+    # 06:10 UTC = 03:10 em Brasília — depois de os REPs terem coletado a noite.
+    - cron: "10 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dias:
+        description: "Janela em dias (1-90)"
+        required: false
+        default: "7"
+      dry_run:
+        description: "Só simular, sem gravar"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: sync-rhid
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Coletar e gravar apuração
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies (frozen lockfile)
+        run: bun install --frozen-lockfile
+
+      - name: Sincronizar
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          bun scripts/sync-rhid.ts \
+            --dias "${{ github.event.inputs.dias || '7' }}" \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}

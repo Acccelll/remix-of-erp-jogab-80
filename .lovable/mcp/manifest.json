@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ftqmgcxhevbwcddtkhrq.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "erp-jogab",
+      "version": "0.1.0",
+      "title": "ERP-JOGAB"
+    },
+    "tools": [
+      {
+        "name": "list_obras",
+        "title": "Listar obras",
+        "description": "Lista as obras (centros de custo) visíveis para o usuário autenticado, com busca opcional por nome ou código.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "busca": {
+              "type": "string",
+              "description": "Filtra por nome ou código da obra."
+            },
+            "limite": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Máximo de obras (padrão 50)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_obra",
+        "title": "Detalhar obra",
+        "description": "Retorna os dados completos de uma obra pelo seu id (UUID).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "obra_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "UUID da obra."
+            }
+          },
+          "required": [
+            "obra_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_cronograma_obra",
+        "title": "Listar cronograma da obra",
+        "description": "Lista os itens de cronograma de uma obra, com datas, avanço e marcação de caminho crítico.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "obra_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "UUID da obra."
+            },
+            "apenas_criticos": {
+              "type": "boolean",
+              "description": "Retorna apenas itens do caminho crítico."
+            },
+            "limite": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "description": "Máximo de itens (padrão 100)."
+            }
+          },
+          "required": [
+            "obra_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_medicoes_obra",
+        "title": "Listar medições da obra",
+        "description": "Lista as medições (boletins de medição) registradas para uma obra.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "obra_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "UUID da obra."
+            },
+            "limite": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Máximo de registros (padrão 50)."
+            }
+          },
+          "required": [
+            "obra_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_oportunidades",
+        "title": "Listar oportunidades (CRM)",
+        "description": "Lista as oportunidades do CRM visíveis para o usuário autenticado, com filtro opcional por etapa/status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Etapa/status da oportunidade."
+            },
+            "busca": {
+              "type": "string",
+              "description": "Filtra pelo título da oportunidade."
+            },
+            "limite": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Máximo de registros (padrão 50)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

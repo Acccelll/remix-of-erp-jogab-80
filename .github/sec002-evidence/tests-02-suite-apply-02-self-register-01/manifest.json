@@ -1,0 +1,32 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-suite-apply-02-self-register-01",
+  "ref": "R146",
+  "spec_ref": "R145",
+  "changeset": "SEC-002.tests-02-suite.apply-02.self-register-01.materialize-01.md",
+  "invariants_verified": [
+    "TSR2-1","TSR2-2","TSR2-3","TSR2-4","TSR2-5",
+    "TSR2-6","TSR2-7","TSR2-8","TSR2-9","TSR2-10"
+  ],
+  "apply_map_version_preserved": true,
+  "index_row": 33,
+  "expected_index_rows_before": 32,
+  "expected_index_rows_after": 33,
+  "target_apply_manifest": ".github/sec002-evidence/tests-02-suite-apply-02/manifest.json",
+  "target_apply_ref": "R144",
+  "files_touched": [
+    ".github/sec002-evidence/INDEX.md",
+    ".github/sec002-evidence/tests-02-suite-apply-02-self-register-01/manifest.json"
+  ],
+  "production_files_touched": [],
+  "hashes": {
+    ".github/sec002-evidence/INDEX.md": "6310f4f16bcbcbbb2a753d44c3eb824d4e7ee1545a4ab17431f23f7d56ac763b"
+  },
+  "pc_gate": {
+    "status": "off_until_pc4_bump",
+    "reason": "EXPECTED_INDEX_ROWS=32 no verificador; bump 32→33 delegado a R147",
+    "reactivation_ref": "R147"
+  },
+  "refs": ["R58","R95","R127","R136","R137","R138","R140","R142","R143","R144","R145","R146"],
+  "timestamp": "2026-07-12T19:05:00Z"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "ref": "R172",
+  "kind": "pc4-bump",
+  "expected_index_rows_before": 38,
+  "expected_index_rows_after": 39,
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "preserved_index_head_sha256": "d16e1803b74b82e1",
+  "invariants_applied": ["PC4B6-1","PC4B6-2","PC4B6-3","PC4B6-4","PC4B6-5","PC4B6-6","PC4B6-7","PC4B6-8"],
+  "invariants_tvbp": ["TVBP11-1","TVBP11-2","TVBP11-3","TVBP11-4","TVBP11-5","TVBP11-6","TVBP11-7","TVBP11-8"],
+  "closes_gate": "E_WAVE2_PC4 38 vs 39",
+  "restores": ["PC1","PC2","PC3","PC4","PC5","PC6","PC7"],
+  "not_touched": ["INDEX.md","_lib/","migrations/","src/","supabase/"],
+  "created_at": "2026-07-12T20:15:00Z"
+}

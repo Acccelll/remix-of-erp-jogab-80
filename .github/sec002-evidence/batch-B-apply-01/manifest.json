@@ -1,0 +1,48 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "batch-B-apply-01",
+  "ref": "R149",
+  "spec_ref": "R148",
+  "changeset": "SEC-002.batch-B.migration.apply-01.materialize-01.md",
+  "invariants_verified": [
+    "AB1","AB2","AB3","AB4","AB5","AB6","AB7","AB8",
+    "AB9","AB10","AB11","AB12","AB13","AB14","AB15","AB16"
+  ],
+  "apply_map_version_preserved": true,
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "target_deploy_path": "supabase/migrations/<yyyymmddhhmmss>_sec_002_batch_b.sql",
+  "target_deploy_timestamp_deferred": true,
+  "requires": {
+    "helpers-02.migration": "applied",
+    "tests-02.suite/helpers": "green",
+    "tests-02.suite/batch-B": "green",
+    "sec-001.release_train": "R1..R10 complete",
+    "snapshot_lt_1h": true,
+    "dri_window": "GM"
+  },
+  "counts": {
+    "tables": 13,
+    "create_policy": 27,
+    "alter_table_enable_rls": 13,
+    "transactions": 1
+  },
+  "table_order": [
+    "audit_logs","centros_custo_totvs","clientes","documento_tipos",
+    "empresas","formas_pagamento","funcoes","notificacoes",
+    "plano_contas","players","profiles","user_empresas","user_roles"
+  ],
+  "files_touched": [
+    ".github/sec002-evidence/batch-B-apply-01/candidate.sql"
+  ],
+  "production_files_touched": [],
+  "hashes": {
+    ".github/sec002-evidence/batch-B-apply-01/candidate.sql": "174e445ae6c57d839c797aca93d21cb07dc706f2b18ee5b1e82c4b4c72b04e0f",
+    ".github/sec002-evidence/INDEX.md": "6310f4f16bcbcbbb2a753d44c3eb824d4e7ee1545a4ab17431f23f7d56ac763b"
+  },
+  "index_row": null,
+  "index_row_delegated_to": ["R150","R151"],
+  "expected_index_rows_bump_delegated_to": "R152",
+  "refs": ["R58","R95","R127","R143","R144","R146","R147","R148","R149"],
+  "timestamp": "2026-07-12T19:20:00Z"
+}

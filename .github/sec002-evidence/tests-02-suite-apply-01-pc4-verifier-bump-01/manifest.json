@@ -1,0 +1,26 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-suite-apply-01-pc4-verifier-bump-01",
+  "ref": "R142",
+  "spec_ref": "R141",
+  "changeset": "SEC-002.tests-02-suite.apply-01.pc4-verifier-bump-01.materialize-01.md",
+  "invariants_verified": ["TVB1","TVB2","TVB3","TVB4","TVB5","TVB6","TVB7","TVB8"],
+  "apply_map_version_preserved": true,
+  "expected_index_rows_before": 31,
+  "expected_index_rows_after": 32,
+  "production_files_touched": [],
+  "files_touched": [
+    "scripts/sec002/verify-wave-2-preconditions.mjs"
+  ],
+  "hashes": {
+    "scripts/sec002/verify-wave-2-preconditions.mjs": "1cfe9d2b4c0f05d32d69646aad91fc526124fa23e959647d4ed064a49fc27198",
+    ".github/sec002-evidence/INDEX.md": "413d49f904417e20fdf1af3094a7aed62ae976d8b111fcee19c29eb477329beb"
+  },
+  "pc_gate": {
+    "status": "green",
+    "checked": ["PC1","PC2","PC3","PC4","PC5","PC6","PC7"],
+    "ok": true
+  },
+  "refs": ["R58","R138","R139","R140","R141","R142"],
+  "timestamp": "2026-07-12T18:48:00Z"
+}

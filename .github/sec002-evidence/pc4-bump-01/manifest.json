@@ -1,0 +1,26 @@
+{
+  "apply_id": "pc4-bump-01",
+  "schema_version": "v2026-07-12.4",
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "expected_index_rows_before": 33,
+  "expected_index_rows_after": 34,
+  "target_file": "scripts/sec002/verify-wave-2-preconditions.mjs",
+  "target_line": 10,
+  "spec_doc": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.pc4-bump-01.spec-01.md",
+  "materialize_doc": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.pc4-bump-01.materialize-01.md",
+  "invariants_applied": ["PC4B-1","PC4B-2","PC4B-3","PC4B-4","PC4B-5","PC4B-6","PC4B-7","PC4B-8"],
+  "invariants_tvbp": ["TVBP-1","TVBP-2","TVBP-3","TVBP-4","TVBP-5","TVBP-6","TVBP-7","TVBP-8"],
+  "not_touched": [
+    "supabase/migrations/",
+    ".github/sec002-evidence/INDEX.md",
+    ".github/sec002-evidence/batch-B-apply-01/",
+    ".github/sec002-evidence/batch-B-apply-01-self-register-01/",
+    "scripts/sec002/_lib/",
+    "scripts/sec002/helpers/",
+    "scripts/sec002/batches/",
+    "src/",
+    "tests/"
+  ],
+  "created_at_utc": "2026-07-12T19:15:00Z"
+}

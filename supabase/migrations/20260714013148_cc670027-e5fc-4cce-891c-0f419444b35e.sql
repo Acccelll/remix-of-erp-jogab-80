@@ -1,0 +1,1 @@
+ALTER VIEW public.vw_financeiro_obra SET (security_invoker = on);

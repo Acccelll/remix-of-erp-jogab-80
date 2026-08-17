@@ -1,0 +1,31 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "helpers-02-apply-01",
+  "changeset_spec": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.spec-01.md",
+  "changeset_materialize": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.materialize-01.md",
+  "source_contract": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.spec-01.md",
+  "source_logical_contract": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-01.md",
+  "materialization": {
+    "candidate_path": ".github/sec002-evidence/helpers-02-apply-01/candidate.sql",
+    "target_deploy_path": "supabase/migrations/<yyyymmddhhmmss>_sec_002_helpers_02.sql",
+    "timestamp_assignment": "at_deploy_pr_open",
+    "auto_applied": false
+  },
+  "wave": 2,
+  "wave_status": "OPEN",
+  "verifier_gate": "on",
+  "expected_index_rows_at_apply": 30,
+  "invariants_verified": [
+    "AP1", "AP2", "AP3", "AP4", "AP5", "AP6",
+    "AP7", "AP8", "AP9", "AP10", "AP11", "AP12"
+  ],
+  "dri": {
+    "gm": "Cappucceno",
+    "tecnico": "Lovable"
+  },
+  "refs": ["R58", "R95", "R127", "R130", "R131", "R132"],
+  "index_row": null,
+  "index_row_delegated_to": "R133/R134 (self-register-01)",
+  "verifier_bump_delegated_to": "R135 (EXPECTED_INDEX_ROWS: 30 -> 31)",
+  "produced_at": "2026-07-12T18:05:00Z"
+}

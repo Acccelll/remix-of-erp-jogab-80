@@ -1,0 +1,1 @@
+ALTER TABLE public.solicitacoes_financeiras ADD COLUMN IF NOT EXISTS pagamento_pendente boolean NOT NULL DEFAULT false;

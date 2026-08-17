@@ -1,0 +1,51 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.formal-apply-01.spec-01.md",
+  "changed_files": [
+    ".github/sec002-readiness/wave-2.md"
+  ],
+  "preconditions_verified": {
+    "PC1": {
+      "status": "OK",
+      "evidence": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.formal-closure-01.md"
+    },
+    "PC2": {
+      "status": "OK",
+      "evidence": ".github/sec002-readiness/wave-2.md (BLOCKED no SHA pré-execução)"
+    },
+    "PC3": {
+      "status": "OK",
+      "evidence": "scripts/sec002/load-apply-map.mjs + docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc3-scope-01.pair-debt-01.materialize-01.md"
+    },
+    "PC4": {
+      "status": "OK",
+      "evidence": ".github/sec002-evidence/INDEX.md (29 linhas úteis) + verifyPC4() com EXPECTED_INDEX_ROWS=29"
+    },
+    "PC5": {
+      "status": "OK",
+      "evidence": ".github/sec002-guards-status.json (GREEN_ATTESTED, janela 7d)"
+    },
+    "PC6": {
+      "status": "OK",
+      "evidence": ".github/sec002-dri/wave-2-formal-open-01.md (GM Cappucceno, DRI técnico Lovable)"
+    },
+    "PC7": {
+      "status": "OK",
+      "evidence": ".github/sec002-decisions/wave-2-formal-open-01.md (Autor, Data ISO-8601 UTC, Justificativa ≥3 linhas)"
+    }
+  },
+  "verifier_sha": "6882770bd41c3ca35de8c500085a85a661797b59",
+  "verifier_output_json_pre_apply": {
+    "ok": true,
+    "schema_version": "v2026-07-12.4",
+    "apply_id": "wave-2-formal-open-01",
+    "checked": ["PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7"]
+  },
+  "verifier_output_json_post_apply_note": "PC2 inverte para E_WAVE2_PC2 (status=OPEN) por design — o verificador é gate de abertura e reflete corretamente que a Onda 2 saiu de BLOCKED. Nova gating para futuros applies operacionais dentro da Onda 2 será tratada em changeset separado.",
+  "guards_green_run": ".github/sec002-guards-status.json (GREEN_ATTESTED)",
+  "dri_gm": "Cappucceno",
+  "dri_tecnico": "Lovable",
+  "opened_at": "2026-07-12T17:16:41Z",
+  "refs": ["R95", "R98", "R101", "R106", "R113", "R116", "R119", "R122", "R125", "R126", "R127"]
+}

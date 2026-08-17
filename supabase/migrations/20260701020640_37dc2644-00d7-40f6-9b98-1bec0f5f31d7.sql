@@ -1,0 +1,5 @@
+
+DROP POLICY IF EXISTS "obras select" ON public.obras;
+CREATE POLICY "obras select" ON public.obras
+  FOR SELECT TO authenticated
+  USING (public.current_is_gm() OR empresa_id = ANY (public.current_empresas()));

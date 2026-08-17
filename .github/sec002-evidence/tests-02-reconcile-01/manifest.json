@@ -1,0 +1,36 @@
+{
+  "changeset": "SEC-002.tests-02.reconcile-01.materialize-01",
+  "ref": "R203'",
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "applied": true,
+  "decision": "D-6a",
+  "target": {
+    "file": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.inventory-02.csv",
+    "baseline_sha256": "c814355885800e6f461989925bdbd4b49baed86f2081a6e684e6ba4b628494a2",
+    "after_sha256": "8c18a694442e4aab74b5bd820304b33e6fd756ded8fe53b04302446d66a404ef",
+    "rewrite_method": "single-cell edit on line 70 field 7 (batch): D → C",
+    "line_count": 74
+  },
+  "reclassification": {
+    "table": "public.solicitacao_comentarios",
+    "from_batch": "D",
+    "to_batch": "C"
+  },
+  "counts_before": { "B": 13, "C": 23, "D": 15, "E": 22, "total": 73 },
+  "counts_after":  { "B": 13, "C": 24, "D": 14, "E": 22, "total": 73 },
+  "refs": ["R191", "R200'", "R201'", "R202'"],
+  "invariants_verified": [
+    "R6M-1",
+    "R6M-2",
+    "R6M-3",
+    "R6M-4",
+    "R6M-5",
+    "R6M-6",
+    "R6M-7",
+    "R6M-8"
+  ],
+  "verifier_gate": "on",
+  "verifier_result": "ok: true, PC1..PC7 green",
+  "date": "2026-07-12T22:25:00Z"
+}

@@ -1,0 +1,74 @@
+schema,table,policies_total,permissive_authenticated,auth_only,role_scoped,batch,target_rule,helpers,depends_on,notes
+public,aditivos_contrato,4,4,0,0,C,obra+empresa; escrita gm/obras,"user_in_empresa,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,audit_logs,4,4,0,0,B,leitura gm/admin; escrita service_role,current_is_gm,SEC-001.k,todas as politicas atuais sao USING(true) permissive
+public,bms_previstas,4,4,0,0,C,obra scope; escrita obras,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,bms_redistribuicao,4,4,0,0,C,obra scope; escrita obras,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,board_campos,4,0,3,0,E,membros do board,user_in_board,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,board_listas,4,0,3,0,E,membros do board,user_in_board,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,board_membros,4,0,3,0,E,owner do board + gm,"auth.uid,current_is_gm",SEC-001.k,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,boards,4,0,3,0,E,owner/membros,"auth.uid,current_is_gm",SEC-001.k,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_anexos,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_atividades,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_board_posicao,4,0,3,0,E,membros do board,user_in_board,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_campos_valores,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_checklist_itens,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_comentarios,4,0,3,0,E,autor+membros,"auth.uid,user_in_card",SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_custom_field_valores,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_grupos_negociacao,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_label_links,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_labels,4,0,3,0,E,membros do board,user_in_board,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_local,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_membros,4,0,3,0,E,owner do card + gm,"auth.uid,current_is_gm",SEC-001.k,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_membros_externos,4,0,3,0,E,owner do card + gm,"auth.uid,current_is_gm",SEC-001.k,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_recursos,4,0,3,0,E,membros do card,user_in_card,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_secoes_visiveis,4,0,3,0,E,membros do board,user_in_board,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_setores,4,0,3,0,E,membros do board,user_in_board,SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,card_views_salvas,4,0,3,0,E,owner da view,auth.uid,SEC-001.k,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,cards,4,0,3,0,E,membros do card/board,"user_in_card,user_in_board",SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,centros_custo_totvs,4,4,0,0,B,registry: leitura authenticated; escrita gm/admin,"current_is_gm,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,clientes,4,4,0,0,B,registry: leitura authenticated; escrita gm/admin,"current_is_gm,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,colaboradores,4,4,0,0,C,empresa scope; escrita dp/rh/gm,"user_in_empresa,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,controle_despesas,4,4,0,0,D,financeiro/compras + gm; segregacao,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_baselines,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_dependencias,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_item_baseline,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_item_revisoes,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_itens,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_marcos,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,cronograma_revisoes,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,custo_colaborador_competencia,4,4,0,0,D,dp + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,decimo_terceiro,4,4,0,0,D,dp + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,documento_tipos,4,4,0,0,B,registry: leitura authenticated; escrita gm/admin,"current_is_gm,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,dp_holerite,4,4,0,0,D,dp + gm; owner colaborador leitura opcional,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,empresas,4,0,3,0,B,registry+scope: membros da empresa; escrita gm,"user_in_empresa,current_is_gm",SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,financeiro_lancamentos,4,4,0,0,D,financeiro/compras + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,financeiro_rateios,4,4,0,0,D,financeiro/compras + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,financeiro_snapshots,4,4,0,0,D,financeiro + gm; leitura ampliada,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,fopag_entries,4,4,0,0,D,dp + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,formas_pagamento,4,4,0,0,B,registry: leitura authenticated; escrita gm/financeiro,"current_is_gm,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,funcoes,4,4,0,0,B,registry: leitura authenticated; escrita gm/admin,"current_is_gm,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,historico_salarial,4,4,0,0,D,dp + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,horas_extras,4,4,0,0,D,dp + gm; owner colaborador leitura opcional,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,itens_medicao,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,licoes_aprendidas,4,4,0,0,C,obra scope; leitura empresa,"user_in_obra,user_in_empresa",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,medicoes,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,mobilizacoes_periodos,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,mobilizacoes_veiculos,4,4,0,0,C,obra scope + frota,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,notas_fiscais,4,4,0,0,D,financeiro + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,notificacoes,3,3,0,0,B,owner destinatario; escrita service_role/gm,"auth.uid,current_is_gm",SEC-001.k,todas as politicas atuais sao USING(true) permissive
+public,obra_membros,4,0,0,3,C,membros da obra + gm (ja parcial),"current_is_gm,user_in_obra",SEC-001.k;SEC-002.helpers-01,
+public,obras,4,4,0,0,C,empresa scope; escrita gm/obras,"user_in_empresa,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,ocorrencias,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,patrimonios,4,4,0,0,C,empresa scope; escrita patrimonio,"user_in_empresa,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,plano_contas,4,4,0,0,B,registry: leitura authenticated; escrita gm/financeiro,"current_is_gm,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,players,4,4,0,0,B,owner self-read; escrita gm/admin,"auth.uid,current_is_gm",SEC-001.k,todas as politicas atuais sao USING(true) permissive
+public,profiles,2,1,0,0,B,owner self; escrita gm/admin,"auth.uid,current_is_gm",SEC-001.k,
+public,provisoes,4,4,0,0,D,dp + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,recebimentos,4,4,0,0,D,financeiro + gm,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,responsabilidades_patrimonios,4,4,0,0,C,empresa+obra scope,"user_in_empresa,user_in_obra",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,riscos,4,4,0,0,C,obra scope,"user_in_obra,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,solicitacao_comentarios,4,4,0,0,C,autor+aprovadores; segregacao,"auth.uid,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,solicitacoes_financeiras,4,4,0,0,D,solicitante + aprovador (segregacao),"auth.uid,has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive
+public,user_empresas,4,0,3,0,B,owner self-read; escrita gm/admin,"auth.uid,current_is_gm",SEC-001.k,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,user_roles,1,0,0,0,B,leitura via has_role SD; escrita gm/service_role,"has_role,current_is_gm",SEC-001.k;SEC-002.helpers-01,auth-only (auth.uid IS NOT NULL) — precisa scope de negocio
+public,veiculos,4,4,0,0,C,empresa scope; escrita frota,"user_in_empresa,has_role",SEC-001.k;SEC-002.helpers-01,todas as politicas atuais sao USING(true) permissive

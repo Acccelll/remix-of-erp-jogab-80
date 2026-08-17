@@ -1,0 +1,491 @@
+{
+  "descricao": "Valores reais de cidade/uf/cep dos colaboradores ativos, extraídos de um dump de produção para travar a regressão do geocoding. Anônimo: sem nome, CPF, id ou endereço, e com o sufixo do CEP zerado — só o prefixo de 5 dígitos importa para deduzir a UF.",
+  "total": 97,
+  "registros": [
+    {
+      "cidade": "Piracicaba/SP",
+      "uf": "",
+      "cep": "13400-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13503-000"
+    },
+    {
+      "cidade": "Santa Mariana/PR",
+      "uf": "",
+      "cep": "86350-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13402-000"
+    },
+    {
+      "cidade": "Charqueada/SP",
+      "uf": "",
+      "cep": "13515-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Ribeirão Preto/SP",
+      "uf": "",
+      "cep": "14031-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Chapadão do Céu/GO",
+      "uf": "",
+      "cep": "75828-000"
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13501-000"
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "Chapadão do Sul/MS",
+      "uf": "",
+      "cep": "79560-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13503-000"
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "Ipeúna/SP",
+      "uf": "",
+      "cep": "13537-000"
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13502-000"
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "PRADÓPOLIS/SP",
+      "uf": "",
+      "cep": "14850-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": "13840-000"
+    },
+    {
+      "cidade": "Piracicaba/SP",
+      "uf": "",
+      "cep": "13420-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13501-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "GUARIBA/SP",
+      "uf": "",
+      "cep": "14840-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Ipeúna/SP",
+      "uf": "",
+      "cep": "13537-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Charqueada/SP",
+      "uf": "",
+      "cep": "13515-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13503-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13504-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Barra Bonita/SP",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": "37262-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13500-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13501-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Guariba/SP",
+      "uf": "",
+      "cep": "14845-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13502-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13504-000"
+    },
+    {
+      "cidade": "Matão/SP",
+      "uf": "",
+      "cep": "15997-000"
+    },
+    {
+      "cidade": "São Bernardo do Campo/SP",
+      "uf": "",
+      "cep": "09851-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13504-000"
+    },
+    {
+      "cidade": "FLORESTOPOLIS",
+      "uf": "",
+      "cep": "86165-000"
+    },
+    {
+      "cidade": "Rio Claro",
+      "uf": "",
+      "cep": "13503-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "Rio Claro",
+      "uf": "",
+      "cep": "13507-000"
+    },
+    {
+      "cidade": "CHAVAL/CE",
+      "uf": "",
+      "cep": "13484-000"
+    },
+    {
+      "cidade": "SANTA QUITERIA DO MARANHÃ-MA",
+      "uf": "",
+      "cep": "13501-000"
+    },
+    {
+      "cidade": "Barra Bonita/SP",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "IGARAÇU DO TIETE/SP",
+      "uf": "",
+      "cep": "17350-000"
+    },
+    {
+      "cidade": "Taboão da Serra/SP",
+      "uf": "",
+      "cep": "06765-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "RIO CLARO-SP",
+      "uf": "",
+      "cep": "13503-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13506-000"
+    },
+    {
+      "cidade": "Chaqueada/SP",
+      "uf": "",
+      "cep": "13515-000"
+    },
+    {
+      "cidade": "Triunfo/PB",
+      "uf": "",
+      "cep": "13501-000"
+    },
+    {
+      "cidade": "Charqueada/SP",
+      "uf": "",
+      "cep": "13515-000"
+    },
+    {
+      "cidade": "Ibaté/SP",
+      "uf": "",
+      "cep": "14815-000"
+    },
+    {
+      "cidade": "Piracicaba/SP",
+      "uf": "",
+      "cep": "13400-000"
+    },
+    {
+      "cidade": "Rio Brilhante/MS",
+      "uf": "",
+      "cep": "79130-000"
+    },
+    {
+      "cidade": "Charqueada/SP",
+      "uf": "",
+      "cep": "13518-000"
+    },
+    {
+      "cidade": "Barra Bonita/SP",
+      "uf": "",
+      "cep": "17340-000"
+    },
+    {
+      "cidade": "Itapagipe/MG",
+      "uf": "",
+      "cep": "38240-000"
+    },
+    {
+      "cidade": "Rio Claro/SP",
+      "uf": "",
+      "cep": "13502-000"
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    },
+    {
+      "cidade": "",
+      "uf": "",
+      "cep": ""
+    }
+  ]
+}

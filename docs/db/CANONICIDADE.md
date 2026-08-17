@@ -1,0 +1,87 @@
+# Matriz de Canonicidade de Entidades
+
+**DB-005 · Onda 1 · Programa de Modernização.**
+Declaração formal, exigida pela Decisão [D-3](../modernizacao/EXECUCAO/00_EXECUTIVO/07_DECISOES.md),
+de qual tabela é a **fonte da verdade** para cada entidade compartilhada
+entre bancos/schemas e quais são **espelhos read-only**.
+
+## Matriz
+
+| Entidade    | Tabela canônica (fonte da verdade) | Espelhos read-only           | Origem de escrita permitida no espelho |
+| ----------- | ---------------------------------- | ---------------------------- | -------------------------------------- |
+| Colaborador | `public.colaboradores`             | `public.players`             | **nenhuma** — sincronização derivada   |
+| Obra        | `public.obras`                     | `public.centros_custo_totvs` | somente import TOTVS (service_role)    |
+
+> **Divergência conhecida entre esta matriz e o runtime (2026-07-30).**
+> A matriz declara o Postgres canônico para Colaborador, mas o domínio roda
+> integralmente no MySQL via `api.php`: cadastro, mobilização, alocação e
+> histórico são lidos e escritos lá. As tabelas Postgres correspondentes
+> (`mobilizacoes_periodos`, em particular) **não recebem escrita alguma** —
+> nenhum código do repositório insere nelas.
+>
+> Isso já custou caro em silêncio: `ExportMovimentacoesDialog` e `RdoTab` liam
+> `mobilizacoes_periodos` no Supabase enquanto todas as mobilizações eram
+> gravadas no MySQL, então a exportação de movimentações e a lista de presentes
+> do RDO vinham vazias ou desatualizadas sem nenhum erro. Ambos passaram a
+> consumir a rota `mobilizacoesPeriodos` do `api.php` nesta data.
+>
+> Enquanto o domínio não for de fato migrado, tratar o MySQL como fonte da
+> verdade operacional de Colaborador e **não** adicionar leitores das tabelas
+> Postgres espelho.
+>
+> **Atualização 2026-08-01.** Patrimônio e Contrato entraram no mesmo trilho:
+> o histórico dos três é agora um log de eventos tipado no MySQL
+> (`movimentacoes`, `movimentacoes_patrimonios`, `movimentacoes_contratos`),
+> lido pelas rotas `mobilizacoesPeriodos`, `patrimoniosPeriodos` e
+> `contratosPeriodos`. Em contrato, a coluna `contratos.historico` foi
+> preservada como cópia original do que a migração importou e saiu do conjunto
+> gravável — é legado somente-leitura, e escrever nela de novo faria as duas
+> fontes divergirem.
+>
+> **Veículo é o único que ainda não migrou:** `VeiculoHistoricoSection` segue
+> derivando períodos por regex sobre a descrição, com período-base sintético.
+
+## Regras derivadas (contrato)
+
+1. **UI** só escreve em `colaboradores` e `obras`. Nenhuma tela pode
+   inserir/alterar/excluir diretamente em `players` ou
+   `centros_custo_totvs`.
+2. `players` é populada a partir de `colaboradores` (via job/trigger a
+   ser implementado na Onda 2/3 quando a autenticação estiver
+   consolidada). Enquanto o job não existir, `players` permanece como
+   tabela auxiliar de perfil de acesso — **não** deve ganhar campos que
+   duplicam colaborador.
+3. `centros_custo_totvs` é populada exclusivamente pelo importador TOTVS
+   (`src/lib/financeiro-totvs/centros.ts` e `pages/financeiro/FinImportar.tsx`).
+   Todo import roda com service_role; a UI comum não deve escrever.
+4. Consultas cruzadas entre canônico e espelho fazem `JOIN` pela chave
+   natural declarada abaixo. Divergência = bug do lado do espelho.
+
+## Chaves naturais de junção
+
+| De → Para                       | Chave                                                            |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `colaboradores` → `players`     | `players.email` = `colaboradores.email` (a formalizar na Onda 2) |
+| `obras` → `centros_custo_totvs` | `centros_custo_totvs.obra_id` = `obras.id`                       |
+
+## Enforcement previsto
+
+O RLS/GRANT desses espelhos não foi ainda restrito nesta onda porque os
+importadores atuais escrevem via `authenticated` (não service_role). A
+Onda 6 (paridade card/obra/DP) executará a migração de trancamento:
+
+```sql
+-- previsto para Onda 6 (após migrar importador para service_role/edge function)
+REVOKE INSERT, UPDATE, DELETE ON public.centros_custo_totvs FROM authenticated;
+REVOKE INSERT, UPDATE, DELETE ON public.players            FROM authenticated;
+```
+
+Até lá, esta matriz vale como **contrato editorial**: qualquer PR que
+introduza escrita a partir de UI em tabela-espelho é rejeitado no
+review, citando este documento.
+
+## Referências
+
+- Decisão [D-3](../modernizacao/EXECUCAO/00_EXECUTIVO/07_DECISOES.md#d-3-canonicidade)
+- Contrato de Execução §4.3 (canonicidade)
+- Auditoria — [Etapa 8 · Arquitetura de Dados](../modernizacao/GOVERNANCA/01_AUDITORIA/ETAPA_08_ARQUITETURA_DADOS.md)

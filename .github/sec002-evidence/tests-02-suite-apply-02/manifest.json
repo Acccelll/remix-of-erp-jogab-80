@@ -1,0 +1,39 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-suite-apply-02",
+  "ref": "R144",
+  "spec_ref": "R143",
+  "changeset": "SEC-002.tests-02-suite.apply-02.materialize-01.md",
+  "invariants_verified": [
+    "AT2-1","AT2-2","AT2-3","AT2-4","AT2-5","AT2-6","AT2-7",
+    "AT2-8","AT2-9","AT2-10","AT2-11","AT2-12","AT2-13","AT2-14"
+  ],
+  "apply_map_version_preserved": true,
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "requires_env": ["SEC002_ALLOW_STAGING=1"],
+  "asserts_total": 20,
+  "asserts_positive": 12,
+  "asserts_negative": 8,
+  "batches": ["B","C","D","E"],
+  "files_touched": [
+    "supabase/tests/sec-002/batch-B/boards_rls.sql",
+    "supabase/tests/sec-002/batch-C/cards_rls.sql",
+    "supabase/tests/sec-002/batch-D/obras_rls.sql",
+    "supabase/tests/sec-002/batch-E/empresas_rls.sql",
+    "supabase/tests/sec-002/batch-E/cross_tenant_deny.sql"
+  ],
+  "hashes": {
+    "supabase/tests/sec-002/batch-B/boards_rls.sql": "8048b5830c6fb84fffa33025b5afd02fed7b8d7f1041652b9b71aeebcd70807c",
+    "supabase/tests/sec-002/batch-C/cards_rls.sql": "ff60fcb4677417c4fc7440a454ca0b153793e3f9a0857407c8fe356caaaf02e9",
+    "supabase/tests/sec-002/batch-D/obras_rls.sql": "f0346d760d71766e655ae0edeec7c466f1c2b1fb9616427ffd46dbba02685f6e",
+    "supabase/tests/sec-002/batch-E/empresas_rls.sql": "d713424aaac768f2b005b4bc0b03f477d46eda7ac6890195a395296ad9c26e25",
+    "supabase/tests/sec-002/batch-E/cross_tenant_deny.sql": "d919e214eba0c6733753f86399f75c32af368cc8b2606ce830cb292c61fbac0b"
+  },
+  "production_files_touched": [],
+  "index_row": null,
+  "index_row_delegated_to": ["R145","R146"],
+  "expected_index_rows_bump_delegated_to": "R147",
+  "refs": ["R58","R95","R127","R136","R137","R138","R140","R142","R143","R144"],
+  "timestamp": "2026-07-12T18:58:00Z"
+}

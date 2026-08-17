@@ -1,0 +1,3 @@
+ALTER TABLE public.cards
+  ADD COLUMN IF NOT EXISTS capa_cor TEXT,
+  ADD COLUMN IF NOT EXISTS capa_url TEXT;

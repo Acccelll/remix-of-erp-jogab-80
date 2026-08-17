@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "historico_medicao_service_all" ON public.historico_medicao;

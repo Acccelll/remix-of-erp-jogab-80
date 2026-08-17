@@ -1,0 +1,23 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-suite-apply-01-self-register-01",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.tests-02-suite.apply-01.self-register-01.spec-01.md",
+  "changeset_materialize": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.tests-02-suite.apply-01.self-register-01.materialize-01.md",
+  "changed_files": [
+    ".github/sec002-evidence/INDEX.md"
+  ],
+  "indexed_apply_id": "tests-02-suite-apply-01",
+  "indexed_manifest": ".github/sec002-evidence/tests-02-suite-apply-01/manifest.json",
+  "index_row": 32,
+  "wave": 2,
+  "wave_status": "OPEN",
+  "verifier_gate": "off_until_pc4_bump",
+  "expected_index_rows_before": 31,
+  "expected_index_rows_after": 32,
+  "apply_map_version_preserved": "v2026-07-12.4",
+  "invariants_verified": ["TSR1","TSR2","TSR3","TSR4","TSR5","TSR6","TSR7","TSR8","TSR9","TSR10"],
+  "refs": ["R58","R95","R127","R136","R137","R138","R139","R140"],
+  "hashes": {
+    ".github/sec002-evidence/INDEX.md": "413d49f904417e20fdf1af3094a7aed62ae976d8b111fcee19c29eb477329beb"
+  }
+}

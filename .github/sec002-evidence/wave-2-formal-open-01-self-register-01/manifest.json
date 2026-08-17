@@ -1,0 +1,17 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01-self-register-01",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.formal-apply-01.self-register-01.spec-01.md",
+  "materialization": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.formal-apply-01.self-register-01.materialize-01.md",
+  "changed_files": [".github/sec002-evidence/INDEX.md"],
+  "index_row": 30,
+  "index_row_line": "| 30 | wave-2-formal-open-01 | .github/sec002-evidence/wave-2-formal-open-01/manifest.json | docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.formal-apply-01.materialize-01.md | v2026-07-12.4 | R94, R95, R97, R101, R106, R113, R116, R119, R122, R125, R126, R127 |",
+  "index_last_updated": "2026-07-12T17:32:00Z",
+  "apply_map_version_preserved": "v2026-07-12.4",
+  "dri_gm": "Cappucceno",
+  "dri_technical": "Lovable",
+  "invariants_verified": ["OA1","OA2","OA3","OA4","OA5","OA6","OA7","OA8","OA9","OA10"],
+  "verifier_gate": "off (post-R127, PC2 inverts by design; reactivation contracted in R130)",
+  "refs": ["R58","R95","R126","R127","R128","R129"],
+  "created_at": "2026-07-12T17:32:00Z"
+}

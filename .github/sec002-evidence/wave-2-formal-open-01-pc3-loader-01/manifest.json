@@ -1,0 +1,20 @@
+{
+  "apply_id": "wave-2-formal-open-01-pc3-loader-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc3-scope-01.loader-01.materialize-01.md",
+  "changed_files": [
+    "scripts/sec002/load-apply-map.mjs"
+  ],
+  "artifact_sha256": {
+    "scripts/sec002/load-apply-map.mjs": "4a8f8942d55d1596d5fc3cd470364913fae844e235dceaeb7bfe5c9ba042f003"
+  },
+  "checks": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC3"
+  ],
+  "refs": ["R73", "R83", "R97", "R109", "R110", "R111"],
+  "notes": [
+    "Loader ESM puro read-only. Retorna Object.freeze(data) quando apply-map presente e válido; retorna null quando arquivo ausente (ENOENT), permitindo fallback loader.SCHEMA_VERSION no verifyPC3.",
+    "Errata leve ao spec R110: adiciona código E_APPLY_MAP_UNREADABLE e comportamento soft-null para ENOENT — invariantes L1..L10 preservadas (L5/L6 mantidas: leitura restrita ao path, zero escrita).",
+    "verifyPC3 dry-run detectou pair-debt em bumps existentes: SEC-002.apply-map-01.consumers-01, .parser-bump-01, .evidence-validator-bump-01. R112 tratará a paridade documental sem tocar produção."
+  ]
+}

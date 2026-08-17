@@ -1,0 +1,17 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "ref": "R178",
+  "kind": "pc4-bump",
+  "expected_index_rows_before": 40,
+  "expected_index_rows_after": 41,
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "preserved_index_head_sha256": "8b5d2d9a58e21493d7edbc1b0d5ccd295a457e897bf322ec63ad30abc98e6b87",
+  "invariants_applied": ["PC4B8-1","PC4B8-2","PC4B8-3","PC4B8-4","PC4B8-5","PC4B8-6","PC4B8-7","PC4B8-8"],
+  "invariants_tvbp": ["TVBP15-1","TVBP15-2","TVBP15-3","TVBP15-4","TVBP15-5","TVBP15-6","TVBP15-7","TVBP15-8"],
+  "closes_gate": "E_WAVE2_PC4 40 vs 41",
+  "restores": ["PC1","PC2","PC3","PC4","PC5","PC6","PC7"],
+  "not_touched": ["INDEX.md","_lib/","migrations/","src/","supabase/"],
+  "created_at": "2026-07-12T20:35:00Z"
+}

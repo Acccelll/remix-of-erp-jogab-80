@@ -1,0 +1,1 @@
+SELECT setval('public.cards_numero_seq', GREATEST(COALESCE((SELECT MAX(numero) FROM public.cards), 0), 1), true);

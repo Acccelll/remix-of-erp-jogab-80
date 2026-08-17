@@ -1,0 +1,45 @@
+{
+  "changeset": "SEC-002.tests-02.fixtures-01.materialize-01",
+  "ref": "R192b",
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "applied": true,
+  "targets": [
+    {
+      "file": "supabase/tests/sec-002/_lib/fixtures.sql",
+      "prefix_lines_preserved": 57,
+      "prefix_sha256_baseline": "e21923a1168cb249ffc6b2d99b8e46def785ea6ce7da4667a4c023133c06c95f",
+      "sha256_after": "cc804d97fe6a7aac73c22f18ffcac0d3da7ce21d396d4e169422b5ba494447bd",
+      "preservation_method": "append-only via shell '>>' operator; prefix bytes untouched by construction"
+    },
+    {
+      "file": "supabase/tests/sec-002/_lib/jwt.sql",
+      "prefix_lines_preserved": 23,
+      "prefix_sha256_baseline": "b1eef646fb5976c4fd61fca6569df89ac7e7898d62b06ad0c934913d62a50b9a",
+      "sha256_after": "b28adf0b387195bde3955af9ce6ca7bc278f95c908efc19123cf17b574e3470d",
+      "preservation_method": "append-only via shell '>>' operator; prefix bytes untouched by construction"
+    }
+  ],
+  "fixtures_added": {
+    "users": ["U_OBR1", "U_BRD1", "U_CRD1", "U_DP", "U_FIN", "U_OUT"],
+    "cards": ["C2"],
+    "board_membros": ["B1 x U_BRD1"],
+    "obra_membros": ["O1 x U_OBR1"],
+    "card_membros": ["C1 x U_CRD1"],
+    "card_board_posicao": ["C2 x B2"],
+    "user_setores": "commented (D-3 pending)",
+    "solicitacoes_financeiras": "conditional insert via do-block, only if column solicitante_id exists"
+  },
+  "jwt_helpers_added": [
+    "pg_temp.set_jwt_gm()",
+    "pg_temp.set_jwt_member(text)",
+    "pg_temp.set_jwt_outsider()",
+    "pg_temp.set_jwt_owner()",
+    "pg_temp.set_jwt_segregation()"
+  ],
+  "d3_pending": true,
+  "d6_pending": true,
+  "verifier_gate": "on",
+  "verifier_result": "ok: true, PC1..PC7 green",
+  "date": "2026-07-12T21:20:00Z"
+}

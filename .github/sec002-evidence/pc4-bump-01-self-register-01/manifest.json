@@ -1,0 +1,36 @@
+{
+  "apply_id": "pc4-bump-01-self-register-01",
+  "schema_version": "v2026-07-12.4",
+  "auto_applied": false,
+  "verifier_gate": "off_until_pc4_bump",
+  "expected_index_rows_before": 34,
+  "expected_index_rows_after": 35,
+  "target_index_path": ".github/sec002-evidence/INDEX.md",
+  "target_row_number": 35,
+  "target_apply_id": "pc4-bump-01",
+  "target_manifest_path": ".github/sec002-evidence/pc4-bump-01/manifest.json",
+  "target_changeset_doc": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.pc4-bump-01.materialize-01.md",
+  "target_schema": "v2026-07-12.4",
+  "target_refs": ["R127", "R146", "R150", "R151", "R152", "R153"],
+  "preserved_index_head_sha256": "00da0ead040261a70097e2678ae6171b66b6f520ffa225b2d57f1031ab670a3e",
+  "candidate_write_set": [
+    ".github/sec002-evidence/INDEX.md",
+    ".github/sec002-evidence/pc4-bump-01-self-register-01/manifest.json"
+  ],
+  "spec_doc": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.pc4-bump-01.self-register-01.spec-01.md",
+  "materialize_doc": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.pc4-bump-01.self-register-01.materialize-01.md",
+  "invariants_applied": ["PSR-1","PSR-2","PSR-3","PSR-4","PSR-5","PSR-6","PSR-7","PSR-8","PSR-9","PSR-10"],
+  "invariants_tvbp2": ["TVBP2-1","TVBP2-2","TVBP2-3","TVBP2-4","TVBP2-5","TVBP2-6","TVBP2-7","TVBP2-8"],
+  "gate_status": "off_until_pc4_bump",
+  "pc4_bump_delegated_to": "R156",
+  "not_touched": [
+    "supabase/migrations/",
+    "scripts/sec002/verify-wave-2-preconditions.mjs",
+    "scripts/sec002/_lib/",
+    "scripts/sec002/helpers/",
+    "scripts/sec002/batches/",
+    "src/",
+    "tests/"
+  ],
+  "created_at_utc": "2026-07-12T19:20:00Z"
+}

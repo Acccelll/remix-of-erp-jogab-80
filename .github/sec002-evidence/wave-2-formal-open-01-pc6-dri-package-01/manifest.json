@@ -1,0 +1,17 @@
+{
+  "apply_id": "SEC-002.wave-2-formal-open-01.pc6-scope-01.dri-package-01.materialize-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc6-scope-01.dri-package-01.materialize-01.md",
+  "changed_files": [
+    ".github/sec002-dri/wave-2-formal-open-01.md",
+    "scripts/sec002/validate-dri-matrix.mjs",
+    ".github/sec002-evidence/wave-2-formal-open-01-pc6-dri-package-01/manifest.json",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc6-scope-01.dri-package-01.materialize-01.md",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.README.md"
+  ],
+  "checks": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC6",
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC1,PC2,PC3,PC4,PC5,PC6"
+  ],
+  "refs": ["R44", "R45", "R49", "R97", "R120", "R121", "R122"]
+}

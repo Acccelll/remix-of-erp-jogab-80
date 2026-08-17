@@ -1,0 +1,18 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "status": "GREEN_ATTESTED",
+  "last_green_sha": "local-r119-pc5-guards-status",
+  "last_green_run_url": "local://sec002/wave-2-formal-open-01/pc5/guards-status-01",
+  "last_green_at": "2026-07-12T17:05:06.045Z",
+  "generated_at": "2026-07-12T17:05:06.045Z",
+  "source": "documented-local-attestation",
+  "validated_by": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC5"
+  ],
+  "notes": [
+    "Artefato documental para satisfazer E_WAVE2_PC5.",
+    "Não promove workflow, não altera INDEX.md e não abre a Onda 2.",
+    "PC6 e PC7 permanecem pendentes."
+  ]
+}

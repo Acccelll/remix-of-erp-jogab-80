@@ -1,0 +1,18 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "changeset": "SEC-002.pc4-bump-07.self-register-01.materialize-01",
+  "target_file": ".github/sec002-evidence/INDEX.md",
+  "appended_row": 41,
+  "expected_index_rows_before": 40,
+  "expected_index_rows_after": 41,
+  "auto_applied": false,
+  "verifier_gate": "off_until_pc4_bump",
+  "preserved_index_head_sha256": "61d386b5c732c3facb8d5e368317179b8e551fa5ef0628314cd0b7a1bc94feba",
+  "index_last_updated": "2026-07-12T20:35:00Z",
+  "invariants_applied": ["PSR7-1","PSR7-2","PSR7-3","PSR7-4","PSR7-5","PSR7-6","PSR7-7","PSR7-8","PSR7-9","PSR7-10"],
+  "invariants_tvbp14": ["TVBP14-1","TVBP14-2","TVBP14-3","TVBP14-4","TVBP14-5","TVBP14-6","TVBP14-7","TVBP14-8"],
+  "refs": ["R158","R159","R160","R161","R162","R163","R164","R165","R167","R169","R171","R172","R174","R175"],
+  "pc4_bump_delegated_to": "R178",
+  "created_at_utc": "2026-07-12T20:35:00Z"
+}

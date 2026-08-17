@@ -1,0 +1,24 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "tests-02-suite-apply-02-pc4-verifier-bump-01",
+  "ref": "R147",
+  "spec_ref": "R147",
+  "changeset": "SEC-002.tests-02-suite.apply-02.pc4-verifier-bump-01.materialize-01.md",
+  "invariants_verified": ["TVB2-1","TVB2-2","TVB2-3","TVB2-4","TVB2-5","TVB2-6","TVB2-7","TVB2-8"],
+  "apply_map_version_preserved": true,
+  "expected_index_rows_before": 32,
+  "expected_index_rows_after": 33,
+  "production_files_touched": [],
+  "files_touched": ["scripts/sec002/verify-wave-2-preconditions.mjs"],
+  "hashes": {
+    "scripts/sec002/verify-wave-2-preconditions.mjs": "f7c1ff9be55ddb07145d8046a141fff7d161386c8e70fd8742463889f96575cd",
+    ".github/sec002-evidence/INDEX.md": "6310f4f16bcbcbbb2a753d44c3eb824d4e7ee1545a4ab17431f23f7d56ac763b"
+  },
+  "pc_gate": {
+    "status": "green",
+    "checked": ["PC1","PC2","PC3","PC4","PC5","PC6","PC7"],
+    "ok": true
+  },
+  "refs": ["R58","R138","R140","R142","R143","R144","R145","R146","R147"],
+  "timestamp": "2026-07-12T19:12:00Z"
+}

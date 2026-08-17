@@ -1,0 +1,26 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "helpers-02-apply-01-pc4-verifier-bump-01",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.pc4-verifier-bump-01.spec-01.md",
+  "materialization": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.helpers-02.apply-01.pc4-verifier-bump-01.materialize-01.md",
+  "changed_files": [
+    "scripts/sec002/verify-wave-2-preconditions.mjs",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.README.md"
+  ],
+  "expected_index_rows_before": 30,
+  "expected_index_rows_after": 31,
+  "index_rows_observed": 31,
+  "index_last_updated_preserved": "2026-07-12T18:20:00Z",
+  "apply_map_version_preserved": "v2026-07-12.4",
+  "invariants_verified": ["HVB1", "HVB2", "HVB3", "HVB4", "HVB5", "HVB6", "HVB7", "HVB8"],
+  "hashes": {
+    "scripts/sec002/verify-wave-2-preconditions.mjs": "e885f7a7a15e62ed06e2b51ce32af656fdc355d5ae3dd23bf487c8ab9a65d4b0",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.README.md": "757a8da87eff4b6fa0c6d2fdec7a2ca6d29dc8fa58f9348782d700fcafa42f6a"
+  },
+  "checks": [
+    "node --check scripts/sec002/verify-wave-2-preconditions.mjs",
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --json"
+  ],
+  "refs": ["R58", "R95", "R127", "R130", "R131", "R132", "R133", "R134", "R135", "R136"],
+  "created_at": "2026-07-12T18:34:00Z"
+}

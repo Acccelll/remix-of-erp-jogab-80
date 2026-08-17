@@ -1,0 +1,16 @@
+{
+  "apply_id": "SEC-002.wave-2-formal-open-01.pc7-scope-01.decision-package-01.materialize-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc7-scope-01.decision-package-01.materialize-01.md",
+  "changed_files": [
+    ".github/sec002-decisions/wave-2-formal-open-01.md",
+    ".github/sec002-evidence/wave-2-formal-open-01-pc7-decision-package-01/manifest.json",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc7-scope-01.decision-package-01.materialize-01.md",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.README.md"
+  ],
+  "checks": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC7",
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC1,PC2,PC3,PC4,PC5,PC6,PC7"
+  ],
+  "refs": ["R97", "R123", "R124", "R125"]
+}

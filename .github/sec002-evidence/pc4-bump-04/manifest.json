@@ -1,0 +1,30 @@
+{
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "changeset": "SEC-002.pc4-bump-04.materialize-01",
+  "target_file": "scripts/sec002/verify-wave-2-preconditions.mjs",
+  "target_line": 10,
+  "expected_index_rows_before": 36,
+  "expected_index_rows_after": 37,
+  "auto_applied": false,
+  "verifier_gate": "on",
+  "invariants_applied": ["PC4B4-1","PC4B4-2","PC4B4-3","PC4B4-4","PC4B4-5","PC4B4-6","PC4B4-7","PC4B4-8"],
+  "invariants_tvbp7": ["TVBP7-1","TVBP7-2","TVBP7-3","TVBP7-4","TVBP7-5","TVBP7-6","TVBP7-7","TVBP7-8"],
+  "not_touched": [
+    ".github/sec002-evidence/INDEX.md",
+    "supabase/migrations/",
+    "scripts/sec002/_lib/",
+    "scripts/sec002/helpers/",
+    "scripts/sec002/batches/",
+    "src/",
+    "tests/",
+    ".github/workflows/",
+    ".github/sec002-evidence/apply-map.json",
+    ".github/sec002-evidence/batch-B-apply-01/",
+    ".github/sec002-evidence/pc4-bump-01/",
+    ".github/sec002-evidence/pc4-bump-02/",
+    ".github/sec002-evidence/pc4-bump-03/"
+  ],
+  "self_register_delegated_to": "R166+",
+  "created_at_utc": "2026-07-12T19:45:00Z"
+}

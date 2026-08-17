@@ -1,0 +1,26 @@
+{
+  "apply_id": "SEC-002.wave-2-formal-open-01.pc4-scope-01.verifier-patch-02.materialize-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc4-scope-01.verifier-patch-02.spec-01.md",
+  "materialization": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc4-scope-01.verifier-patch-02.materialize-01.md",
+  "changed_files": [
+    "scripts/sec002/verify-wave-2-preconditions.mjs",
+    ".github/sec002-evidence/INDEX.md",
+    ".github/sec002-evidence/wave-2-formal-open-01-pc4-verifier-patch-02/manifest.json",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc4-scope-01.verifier-patch-02.spec-01.md",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.pc4-scope-01.verifier-patch-02.materialize-01.md",
+    "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.README.md"
+  ],
+  "checks": [
+    "node --check scripts/sec002/verify-wave-2-preconditions.mjs",
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --json"
+  ],
+  "index_rows_expected": 30,
+  "index_last_updated": "2026-07-12T17:44:00Z",
+  "apply_map_version_preserved": "v2026-07-12.4",
+  "dri_gm": "Cappucceno",
+  "dri_technical": "Lovable",
+  "invariants_verified": ["OP1","OP2","OP3","OP4","OP5","OP6","OP7","OP8","OP9","OP10","OP11","OP12"],
+  "refs": ["R95","R116","R127","R128","R129","R130"],
+  "created_at": "2026-07-12T17:44:00Z"
+}

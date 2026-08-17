@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Install · Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies (frozen lockfile)
+        run: bun install --frozen-lockfile
+
+      - name: Verify xlsx pinning (SheetJS CDN only)
+        # D-06 / DEP-xlsx-pin: bloquear resolução de xlsx fora de cdn.sheetjs.com
+        run: |
+          set -e
+          resolved=$(node -e "console.log(require('./node_modules/xlsx/package.json').version)")
+          echo "xlsx resolved to $resolved"
+          case "$resolved" in
+            0.20.*) echo "OK";;
+            *) echo "xlsx must resolve to 0.20.x from cdn.sheetjs.com"; exit 1;;
+          esac
+
+      - name: Verify lib bimodal convention (BIZ-002)
+        # BIZ-002.d: bloqueia PR se módulos em src/lib violarem @module-kind
+        run: bash scripts/verify-lib-purity.sh
+
+      - name: Verify repository boundary (ARC-003.d)
+        # ARC-003.d: bloqueia PR se pages/components acessarem supabase.from de tabela coberta
+        run: bash scripts/verify-repository-boundary.sh
+
+      - name: Verify DB-001 fronteira sem órfãos
+        # DB-001.b: falha se vw_db001_fronteira_orfaos tiver linhas > 0.
+        # Sem DATABASE_URL o script encerra como skipped (não bloqueia PRs de fork).
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_READONLY }}
+        run: bash scripts/verify-db001-orfaos.sh
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck (strict lib/services)
+        run: bun run typecheck
+
+      - name: Test
+        run: bun run test
+
+      - name: Coverage snapshot (non-blocking)
+        run: bun run test:coverage
+        continue-on-error: true
+
+      - name: Build
+        run: bun run build
+
+  e2e:
+    name: E2E · Caracterização (M1/M5/M7/M8)
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.3
+
+      - name: Install dependencies (frozen lockfile)
+        run: bun install --frozen-lockfile
+
+      - name: Check E2E secrets
+        id: e2e_secrets
+        env:
+          E2E_USER: ${{ secrets.E2E_USER }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: |
+          if [ -n "$E2E_USER" ] && [ -n "$E2E_PASSWORD" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Secrets E2E_USER/E2E_PASSWORD ausentes — pulando E2E."
+          fi
+
+      - name: Install Playwright browsers
+        if: steps.e2e_secrets.outputs.present == 'true'
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run E2E (characterization)
+        if: steps.e2e_secrets.outputs.present == 'true'
+        env:
+          E2E_USER: ${{ secrets.E2E_USER }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: bun run test:e2e
+
+      - name: Upload Playwright report
+        if: always() && steps.e2e_secrets.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 14

@@ -1,0 +1,15 @@
+project_id = "ftqmgcxhevbwcddtkhrq"
+
+# `supabase functions deploy` liga `verify_jwt` por padrão. Estas duas funções
+# são chamadas ANTES de existir sessão — é o trabalho delas criar a conta —,
+# então com verificação ligada elas passam a recusar a chamada e ninguém mais
+# consegue entrar. Declarado aqui para não depender de alguém lembrar de passar
+# `--no-verify-jwt` na linha de comando.
+#
+# As demais funções do projeto também estão publicadas com `verify_jwt = false`;
+# se for reimplantar alguma delas, confira antes com `list_edge_functions`.
+[functions.sync-player-auth]
+verify_jwt = false
+
+[functions.provision-auth-user]
+verify_jwt = false

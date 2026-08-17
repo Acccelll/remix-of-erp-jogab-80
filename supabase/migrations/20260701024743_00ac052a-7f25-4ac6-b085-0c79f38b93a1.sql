@@ -1,0 +1,12 @@
+CREATE INDEX IF NOT EXISTS idx_card_label_links_label ON public.card_label_links (label_id);
+CREATE INDEX IF NOT EXISTS idx_card_membros_user ON public.card_membros (user_id);
+CREATE INDEX IF NOT EXISTS idx_card_setores_card ON public.card_setores (card_id);
+CREATE INDEX IF NOT EXISTS idx_cards_obra ON public.cards (obra_id) WHERE obra_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_cards_cronograma_item ON public.cards (cronograma_item_id) WHERE cronograma_item_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_board_listas_board ON public.board_listas (board_id, posicao);
+CREATE INDEX IF NOT EXISTS idx_cronograma_itens_obra ON public.cronograma_itens (obra_id);
+CREATE INDEX IF NOT EXISTS idx_financeiro_lancamentos_obra ON public.financeiro_lancamentos (obra_id);
+CREATE INDEX IF NOT EXISTS idx_notas_fiscais_obra ON public.notas_fiscais (obra_id);
+CREATE INDEX IF NOT EXISTS idx_ordens_compra_obra ON public.ordens_compra (obra_id);
+CREATE INDEX IF NOT EXISTS idx_requisicoes_obra ON public.requisicoes (obra_id);
+CREATE INDEX IF NOT EXISTS idx_rdo_obra_data ON public.rdo (obra_id, data);

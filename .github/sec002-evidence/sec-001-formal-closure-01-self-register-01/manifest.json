@@ -1,0 +1,15 @@
+{
+  "sec002_apply_id": "sec-001-formal-closure-01-self-register-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-001.formal-closure-01.self-register-01.spec-01.md",
+  "changed_files": [
+    ".github/sec002-evidence/INDEX.md"
+  ],
+  "checks": [
+    "node scripts/sec002/verify-wave-2-preconditions.mjs --dry-run --only=PC1"
+  ],
+  "hashes": {
+    ".github/sec002-evidence/INDEX.md": "a480a4e5d0a46f55499b0f3f54447776aba471cc5d721447ae02012d8668ebbe"
+  },
+  "refs": ["R100", "R101", "R102", "R103"]
+}

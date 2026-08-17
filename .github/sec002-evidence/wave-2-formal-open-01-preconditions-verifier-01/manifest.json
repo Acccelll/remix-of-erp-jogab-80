@@ -1,0 +1,20 @@
+{
+  "sec002_apply_id": "wave-2-formal-open-01-preconditions-verifier-01",
+  "schema_version": "v2026-07-12.4",
+  "source": "docs/modernizacao/EXECUCAO/06_CHANGESETS/SEC-002.wave-2-formal-open-01.preconditions-verifier-01.materialize-01.md",
+  "changed_files": [
+    "scripts/sec002/verify-wave-2-preconditions.mjs"
+  ],
+  "checks": [
+    "node --check scripts/sec002/verify-wave-2-preconditions.mjs"
+  ],
+  "status": "materialized_not_promoted",
+  "blocked_by": [
+    "PC1: SEC-001 ainda não CLOSED",
+    "R98: promoção como gate ainda não emitida"
+  ],
+  "hashes": {
+    "scripts/sec002/verify-wave-2-preconditions.mjs": "f069e5cf86cdbf6a4dbc69b6af262729eab6f3589b6e1072b402d6913d170b93"
+  },
+  "refs": ["R43", "R45", "R67", "R73", "R94", "R95", "R96", "R97"]
+}

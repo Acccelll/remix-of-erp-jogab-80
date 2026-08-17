@@ -1,0 +1,40 @@
+{
+  "changeset": "SEC-002.tests-02.teardown-01.materialize-01",
+  "ref": "R196'",
+  "schema_version": "v2026-07-12.4",
+  "apply_id": "wave-2-formal-open-01",
+  "applied": true,
+  "target": {
+    "file": "supabase/tests/sec-002/_lib/teardown.sql",
+    "baseline_sha256": "48591eff4bfa67447b332039b29f1f5ec2e5593ad0b538acfc517af8efb9b986",
+    "after_sha256": "d3bb3e2db7af2c19a7eb8d66ee411c843f17f3f58f1349664efe1e1e165370b0",
+    "rewrite_method": "controlled full-file replacement per SEC-002.tests-02.teardown-01.spec-01"
+  },
+  "refs": ["R132", "R183", "R192b", "R195'"],
+  "fixtures_removed": {
+    "solicitacoes_financeiras": ["SF1, guarded by information_schema.columns"],
+    "user_setores": ["U_DP", "U_FIN", "guarded by information_schema.tables"],
+    "card_membros": ["C1 x U_CRD1", "C2 x any"],
+    "card_board_posicao": ["C2 x B2"],
+    "cards": ["C2"],
+    "board_membros": ["B1 x U_BRD1"],
+    "obra_membros": ["O1 x U_OBR1"],
+    "profiles": ["U_OBR1", "U_BRD1", "U_CRD1", "U_DP", "U_FIN", "U_OUT"],
+    "user_roles": ["baseline gm cleanup for U1, U2, UGM"]
+  },
+  "invariants_verified": [
+    "TDR01-1",
+    "TDR01-2",
+    "TDR01-3",
+    "TDR01-4",
+    "TDR01-5",
+    "TDR01-6",
+    "TDR01-7",
+    "TDR01-8",
+    "TDR01-9",
+    "TDR01-10"
+  ],
+  "verifier_gate": "on",
+  "verifier_result": "ok: true, PC1..PC7 green",
+  "date": "2026-07-12T21:35:00Z"
+}
