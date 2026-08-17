@@ -415,14 +415,16 @@ export function EvolucaoAprovacoesCard({
   function toggleSel(id: string) {
     setSelecionados((prev) => {
       const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
       return n;
     });
   }
   function toggleChipSel(id: string) {
     setChipSel((prev) => {
       const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
       return n;
     });
   }
@@ -443,7 +445,8 @@ export function EvolucaoAprovacoesCard({
   function toggleCartMarcado(id: string) {
     setCartMarcados((prev) => {
       const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
       return n;
     });
   }
@@ -792,7 +795,6 @@ export function EvolucaoAprovacoesCard({
           </div>
         )}
 
-        {/* Aging */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <AgingCard
             titulo="Aging vencidos (aprovações em aberto)"
@@ -828,7 +830,6 @@ export function EvolucaoAprovacoesCard({
           </div>
         )}
 
-        {/* Dialog com pesquisa, filtros excel, subtotais e envio ao carrinho */}
         <Dialog open={!!agingSel} onOpenChange={(v) => !v && setAgingSel(null)}>
           <DialogContent className="max-w-6xl">
             <DialogHeader>
@@ -888,72 +889,12 @@ export function EvolucaoAprovacoesCard({
                         onCheckedChange={toggleAllChip}
                       />
                     </TableHead>
-                    <ColumnFilterHeader<SortK>
-                      sortKey="setor"
-                      currentKey={sortKey}
-                      dir={sortDir}
-                      onToggleSort={toggle}
-                      options={opcoes.setor}
-                      selected={filtroSetor}
-                      onChangeSelected={setFiltroSetor}
-                    >
-                      Setor
-                    </ColumnFilterHeader>
-                    <ColumnFilterHeader<SortK>
-                      sortKey="solicitante"
-                      currentKey={sortKey}
-                      dir={sortDir}
-                      onToggleSort={toggle}
-                      options={opcoes.solic}
-                      selected={filtroSolic}
-                      onChangeSelected={setFiltroSolic}
-                    >
-                      Solicitante
-                    </ColumnFilterHeader>
-                    <ColumnFilterHeader<SortK>
-                      sortKey="fornecedor"
-                      currentKey={sortKey}
-                      dir={sortDir}
-                      onToggleSort={toggle}
-                      options={opcoes.forn}
-                      selected={filtroForn}
-                      onChangeSelected={setFiltroForn}
-                    >
-                      Fornecedor
-                    </ColumnFilterHeader>
-                    <ColumnFilterHeader<SortK>
-                      sortKey="centro"
-                      currentKey={sortKey}
-                      dir={sortDir}
-                      onToggleSort={toggle}
-                      options={opcoes.centro}
-                      selected={filtroCentro}
-                      onChangeSelected={setFiltroCentro}
-                    >
-                      Centro
-                    </ColumnFilterHeader>
-                    <ColumnFilterHeader<SortK>
-                      sortKey="prioridade"
-                      currentKey={sortKey}
-                      dir={sortDir}
-                      onToggleSort={toggle}
-                      options={opcoes.prior}
-                      selected={filtroPrior}
-                      onChangeSelected={setFiltroPrior}
-                    >
-                      Prioridade
-                    </ColumnFilterHeader>
-                    <ColumnFilterHeader<SortK>
-                      sortKey="status"
-                      currentKey={sortKey}
-                      dir={sortDir}
-                      onToggleSort={toggle}
-                      options={opcoes.status}
-                      selected={filtroStatus}
-                      onChangeSelected={setFiltroStatus}
-                    >
-                      Status
-                    </ColumnFilterHeader>
+                    <ColumnFilterHeader<SortK> sortKey="setor" currentKey={sortKey} dir={sortDir} onToggleSort={toggle} options={opcoes.setor} selected={filtroSetor} onChangeSelected={setFiltroSetor}>Setor</ColumnFilterHeader>
+                    <ColumnFilterHeader<SortK> sortKey="solicitante" currentKey={sortKey} dir={sortDir} onToggleSort={toggle} options={opcoes.solic} selected={filtroSolic} onChangeSelected={setFiltroSolic}>Solicitante</ColumnFilterHeader>
+                    <ColumnFilterHeader<SortK> sortKey="fornecedor" currentKey={sortKey} dir={sortDir} onToggleSort={toggle} options={opcoes.forn} selected={filtroForn} onChangeSelected={setFiltroForn}>Fornecedor</ColumnFilterHeader>
+                    <ColumnFilterHeader<SortK> sortKey="centro" currentKey={sortKey} dir={sortDir} onToggleSort={toggle} options={opcoes.centro} selected={filtroCentro} onChangeSelected={setFiltroCentro}>Centro</ColumnFilterHeader>
+                    <ColumnFilterHeader<SortK> sortKey="prioridade" currentKey={sortKey} dir={sortDir} onToggleSort={toggle} options={opcoes.prior} selected={filtroPrior} onChangeSelected={setFiltroPrior}>Prioridade</ColumnFilterHeader>
+                    <ColumnFilterHeader<SortK> sortKey="status" currentKey={sortKey} dir={sortDir} onToggleSort={toggle} options={opcoes.status} selected={filtroStatus} onChangeSelected={setFiltroStatus}>Status</ColumnFilterHeader>
                     <TableHead>Prazo/Pgto</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                   </TableRow>
@@ -961,79 +902,43 @@ export function EvolucaoAprovacoesCard({
                 <TableBody>
                   {sorted.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center text-muted-foreground py-6">
-                        Nenhuma solicitação encontrada.
-                      </TableCell>
+                      <TableCell colSpan={9} className="text-center text-muted-foreground py-6">Nenhuma solicitação encontrada.</TableCell>
                     </TableRow>
                   ) : (
-                    renderRows(sorted, {
-                      subtotaisOn,
-                      selecionados: chipSel,
-                      toggleSel: toggleChipSel,
-                      centroNome,
-                    })
+                    renderRows(sorted, { subtotaisOn, selecionados: chipSel, toggleSel: toggleChipSel, centroNome })
                   )}
                 </TableBody>
               </Table>
             </div>
 
-            {/* Subtotais da seleção dentro do chip */}
             {(() => {
               const selNoChip = sorted.filter((r) => chipSel.has(r.id));
               const totalSel = selNoChip.reduce((acc, r) => acc + (r.valor || 0), 0);
               return (
                 <div className="flex items-center justify-between gap-2 bg-muted/40 border rounded-md px-3 py-2 text-sm mt-2">
-                  <span>
-                    Selecionados neste aging: <strong>{selNoChip.length}</strong> de {sorted.length}
-                  </span>
-                  <span>
-                    Subtotal da seleção: <strong>{formatBRL(totalSel)}</strong>
-                  </span>
+                  <span>Selecionados neste aging: <strong>{selNoChip.length}</strong> de {sorted.length}</span>
+                  <span>Subtotal da seleção: <strong>{formatBRL(totalSel)}</strong></span>
                 </div>
               );
             })()}
           </DialogContent>
         </Dialog>
 
-        {/* Carrinho — títulos enviados (com pesquisa, filtros excel, subtotais) */}
         <div className="bg-muted/40 border rounded-md p-3 text-sm space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
               <ShoppingCart className="h-4 w-4 text-primary" />
-              <span>
-                Carrinho: <strong>{selecionados.size}</strong> solicitação(ões) ·{" "}
-                <strong>{formatBRL(totalCarrinho)}</strong>
-              </span>
+              <span>Carrinho: <strong>{selecionados.size}</strong> solicitação(ões) · <strong>{formatBRL(totalCarrinho)}</strong></span>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setHistoricoOpen(true)}
-                title="Ver histórico de carrinhos fechados"
-              >
+              <Button variant="outline" size="sm" onClick={() => setHistoricoOpen(true)} title="Ver histórico de carrinhos fechados">
                 <History className="h-4 w-4 mr-1" /> Histórico
-                {historico.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-[10px]">
-                    {historico.length}
-                  </Badge>
-                )}
+                {historico.length > 0 && <Badge variant="secondary" className="ml-1 text-[10px]">{historico.length}</Badge>}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => exportarCSV(carrinhoFiltrado, "carrinho.csv")}
-                disabled={carrinhoFiltrado.length === 0}
-              >
+              <Button variant="outline" size="sm" onClick={() => exportarCSV(carrinhoFiltrado, "carrinho.csv")} disabled={carrinhoFiltrado.length === 0}>
                 <Download className="h-4 w-4 mr-1" /> Exportar CSV
               </Button>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={fecharCarrinho}
-                disabled={selecionados.size === 0}
-                title="Fechar carrinho e gerar histórico"
-              >
+              <Button variant="default" size="sm" onClick={fecharCarrinho} disabled={selecionados.size === 0} title="Fechar carrinho e gerar histórico">
                 <Archive className="h-4 w-4 mr-1" /> Fechar Carrinho
               </Button>
               {selecionados.size > 0 && (
@@ -1046,28 +951,13 @@ export function EvolucaoAprovacoesCard({
 
           {selecionados.size > 0 && (
             <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground">
-              <span>
-                Marcados: <strong className="text-foreground">{cartMarcados.size}</strong> de{" "}
-                {selecionados.size}
-              </span>
+              <span>Marcados: <strong className="text-foreground">{cartMarcados.size}</strong> de {selecionados.size}</span>
               {cartMarcados.size > 0 && (
                 <>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={removerMarcadosDoCarrinho}
-                    title="Remover itens marcados do carrinho"
-                  >
+                  <Button variant="destructive" size="sm" onClick={removerMarcadosDoCarrinho} title="Remover itens marcados do carrinho">
                     <X className="h-4 w-4 mr-1" /> Remover marcados ({cartMarcados.size})
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCartMarcados(new Set())}
-                    title="Desmarcar todos"
-                  >
-                    Desmarcar
-                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setCartMarcados(new Set())} title="Desmarcar todos">Desmarcar</Button>
                 </>
               )}
             </div>
@@ -1078,37 +968,19 @@ export function EvolucaoAprovacoesCard({
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="relative flex-1 min-w-[200px] max-w-sm">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar no carrinho..."
-                    value={cq}
-                    onChange={(e) => setCq(e.target.value)}
-                    className="pl-9 h-8 text-sm"
-                  />
+                  <Input placeholder="Buscar no carrinho..." value={cq} onChange={(e) => setCq(e.target.value)} className="pl-9 h-8 text-sm" />
                 </div>
-                <Button
-                  variant={cSubtotaisOn ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCSubtotaisOn((v) => !v)}
-                >
+                <Button variant={cSubtotaisOn ? "default" : "outline"} size="sm" onClick={() => setCSubtotaisOn((v) => !v)}>
                   <ListChecks className="h-4 w-4 mr-1" /> Subtotais por status
                 </Button>
                 {(carrinhoAlgumFiltro || cq) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      limparFiltrosCarrinho();
-                      setCq("");
-                    }}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => { limparFiltrosCarrinho(); setCq(""); }}>
                     <X className="h-4 w-4 mr-1" /> Limpar filtros
                   </Button>
                 )}
                 <span className="text-xs text-muted-foreground ml-auto">
-                   {carrinhoFiltrado.length} de {carrinhoItens.length} · Subtotal (marcados{" "}
-                   {cartMarcados.size}):{" "}
-                   <strong className="text-foreground">{formatBRL(totalCarrinhoFiltrado)}</strong>
-                 </span>
+                  {carrinhoFiltrado.length} de {carrinhoItens.length} · Subtotal (marcados {cartMarcados.size}): <strong className="text-foreground">{formatBRL(totalCarrinhoFiltrado)}</strong>
+                </span>
               </div>
 
               <div className="max-h-[45vh] overflow-auto border rounded-md bg-background">
@@ -1116,72 +988,12 @@ export function EvolucaoAprovacoesCard({
                   <TableHeader>
                     <TableRow className="bg-muted/50 sticky top-0 z-10">
                       <TableHead className="w-8"></TableHead>
-                      <ColumnFilterHeader<SortK>
-                        sortKey="setor"
-                        currentKey={carrinhoSort.sortKey}
-                        dir={carrinhoSort.sortDir}
-                        onToggleSort={carrinhoSort.toggle}
-                        options={carrinhoOpcoes.setor}
-                        selected={cFiltroSetor}
-                        onChangeSelected={setCFiltroSetor}
-                      >
-                        Setor
-                      </ColumnFilterHeader>
-                      <ColumnFilterHeader<SortK>
-                        sortKey="solicitante"
-                        currentKey={carrinhoSort.sortKey}
-                        dir={carrinhoSort.sortDir}
-                        onToggleSort={carrinhoSort.toggle}
-                        options={carrinhoOpcoes.solic}
-                        selected={cFiltroSolic}
-                        onChangeSelected={setCFiltroSolic}
-                      >
-                        Solicitante
-                      </ColumnFilterHeader>
-                      <ColumnFilterHeader<SortK>
-                        sortKey="fornecedor"
-                        currentKey={carrinhoSort.sortKey}
-                        dir={carrinhoSort.sortDir}
-                        onToggleSort={carrinhoSort.toggle}
-                        options={carrinhoOpcoes.forn}
-                        selected={cFiltroForn}
-                        onChangeSelected={setCFiltroForn}
-                      >
-                        Fornecedor
-                      </ColumnFilterHeader>
-                      <ColumnFilterHeader<SortK>
-                        sortKey="centro"
-                        currentKey={carrinhoSort.sortKey}
-                        dir={carrinhoSort.sortDir}
-                        onToggleSort={carrinhoSort.toggle}
-                        options={carrinhoOpcoes.centro}
-                        selected={cFiltroCentro}
-                        onChangeSelected={setCFiltroCentro}
-                      >
-                        Centro
-                      </ColumnFilterHeader>
-                      <ColumnFilterHeader<SortK>
-                        sortKey="prioridade"
-                        currentKey={carrinhoSort.sortKey}
-                        dir={carrinhoSort.sortDir}
-                        onToggleSort={carrinhoSort.toggle}
-                        options={carrinhoOpcoes.prior}
-                        selected={cFiltroPrior}
-                        onChangeSelected={setCFiltroPrior}
-                      >
-                        Prioridade
-                      </ColumnFilterHeader>
-                      <ColumnFilterHeader<SortK>
-                        sortKey="status"
-                        currentKey={carrinhoSort.sortKey}
-                        dir={carrinhoSort.sortDir}
-                        onToggleSort={carrinhoSort.toggle}
-                        options={carrinhoOpcoes.status}
-                        selected={cFiltroStatus}
-                        onChangeSelected={setCFiltroStatus}
-                      >
-                        Status
-                      </ColumnFilterHeader>
+                      <ColumnFilterHeader<SortK> sortKey="setor" currentKey={carrinhoSort.sortKey} dir={carrinhoSort.sortDir} onToggleSort={carrinhoSort.toggle} options={carrinhoOpcoes.setor} selected={cFiltroSetor} onChangeSelected={setCFiltroSetor}>Setor</ColumnFilterHeader>
+                      <ColumnFilterHeader<SortK> sortKey="solicitante" currentKey={carrinhoSort.sortKey} dir={carrinhoSort.sortDir} onToggleSort={carrinhoSort.toggle} options={carrinhoOpcoes.solic} selected={cFiltroSolic} onChangeSelected={setCFiltroSolic}>Solicitante</ColumnFilterHeader>
+                      <ColumnFilterHeader<SortK> sortKey="fornecedor" currentKey={carrinhoSort.sortKey} dir={carrinhoSort.sortDir} onToggleSort={carrinhoSort.toggle} options={carrinhoOpcoes.forn} selected={cFiltroForn} onChangeSelected={setCFiltroForn}>Fornecedor</ColumnFilterHeader>
+                      <ColumnFilterHeader<SortK> sortKey="centro" currentKey={carrinhoSort.sortKey} dir={carrinhoSort.sortDir} onToggleSort={carrinhoSort.toggle} options={carrinhoOpcoes.centro} selected={cFiltroCentro} onChangeSelected={setCFiltroCentro}>Centro</ColumnFilterHeader>
+                      <ColumnFilterHeader<SortK> sortKey="prioridade" currentKey={carrinhoSort.sortKey} dir={carrinhoSort.sortDir} onToggleSort={carrinhoSort.toggle} options={carrinhoOpcoes.prior} selected={cFiltroPrior} onChangeSelected={setCFiltroPrior}>Prioridade</ColumnFilterHeader>
+                      <ColumnFilterHeader<SortK> sortKey="status" currentKey={carrinhoSort.sortKey} dir={carrinhoSort.sortDir} onToggleSort={carrinhoSort.toggle} options={carrinhoOpcoes.status} selected={cFiltroStatus} onChangeSelected={setCFiltroStatus}>Status</ColumnFilterHeader>
                       <TableHead>Prazo/Pgto</TableHead>
                       <TableHead className="text-right">Valor</TableHead>
                       <TableHead className="w-12 text-right">Ações</TableHead>
@@ -1190,18 +1002,10 @@ export function EvolucaoAprovacoesCard({
                   <TableBody>
                     {carrinhoSort.sorted.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={10} className="text-center text-muted-foreground py-6">
-                          Nenhum item corresponde aos filtros.
-                        </TableCell>
+                        <TableCell colSpan={10} className="text-center text-muted-foreground py-6">Nenhum item corresponde aos filtros.</TableCell>
                       </TableRow>
                     ) : (
-                      renderRows(carrinhoSort.sorted, {
-                        subtotaisOn: cSubtotaisOn,
-                        selecionados: cartMarcados,
-                        toggleSel: toggleCartMarcado,
-                        centroNome,
-                        onRemove: removerDoCarrinho,
-                      })
+                      renderRows(carrinhoSort.sorted, { subtotaisOn: cSubtotaisOn, selecionados: cartMarcados, toggleSel: toggleCartMarcado, centroNome, onRemove: removerDoCarrinho })
                     )}
                   </TableBody>
                 </Table>
@@ -1210,16 +1014,11 @@ export function EvolucaoAprovacoesCard({
           )}
         </div>
 
-        {/* Histórico de carrinhos fechados */}
         <Dialog open={historicoOpen} onOpenChange={setHistoricoOpen}>
           <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Histórico de carrinhos fechados</DialogTitle>
-            </DialogHeader>
+            <DialogHeader><DialogTitle>Histórico de carrinhos fechados</DialogTitle></DialogHeader>
             {historico.length === 0 ? (
-              <div className="text-sm text-muted-foreground text-center py-6">
-                Nenhum carrinho fechado ainda.
-              </div>
+              <div className="text-sm text-muted-foreground text-center py-6">Nenhum carrinho fechado ainda.</div>
             ) : (
               <div className="max-h-[60vh] overflow-auto border rounded-md">
                 <Table>
@@ -1236,31 +1035,12 @@ export function EvolucaoAprovacoesCard({
                       const d = new Date(h.fechado_em);
                       return (
                         <TableRow key={h.id}>
-                          <TableCell className="text-xs">
-                            {d.toLocaleString("pt-BR")}
-                          </TableCell>
+                          <TableCell className="text-xs">{d.toLocaleString("pt-BR")}</TableCell>
                           <TableCell className="text-right">{h.itens.length}</TableCell>
-                          <TableCell className="text-right font-medium">
-                            {formatBRL(h.total)}
-                          </TableCell>
+                          <TableCell className="text-right font-medium">{formatBRL(h.total)}</TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="mr-2"
-                              onClick={() => exportarHistorico(h)}
-                            >
-                              <Download className="h-4 w-4 mr-1" /> CSV
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                setHistorico((prev) => prev.filter((x) => x.id !== h.id))
-                              }
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <Button variant="outline" size="sm" className="mr-2" onClick={() => exportarHistorico(h)}><Download className="h-4 w-4 mr-1" /> CSV</Button>
+                            <Button variant="ghost" size="sm" onClick={() => setHistorico((prev) => prev.filter((x) => x.id !== h.id))}><Trash2 className="h-4 w-4" /></Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -1273,8 +1053,7 @@ export function EvolucaoAprovacoesCard({
         </Dialog>
 
         <p className="text-xs text-muted-foreground">
-          Bucket mensal por <strong>data de pagamento</strong> (ou prazo estimado / criação como
-          fallback). Valores em BRL.
+          Bucket mensal por <strong>data de pagamento</strong> (ou prazo estimado / criação como fallback). Valores em BRL.
         </p>
       </CardContent>
     </Card>
@@ -1300,8 +1079,7 @@ function renderRows(
       rows.push(
         <TableRow key={`sub-${grupoAtual}`} className="bg-muted/30 font-medium">
           <TableCell colSpan={7} className="text-right">
-            Subtotal — {statusLabels[grupoAtual as StatusSolicitacao] || grupoAtual} (marcados{" "}
-            {grupoAcc.qtd})
+            Subtotal — {statusLabels[grupoAtual as StatusSolicitacao] || grupoAtual} (marcados {grupoAcc.qtd})
           </TableCell>
           <TableCell />
           <TableCell className="text-right">{formatBRL(grupoAcc.valor)}</TableCell>
@@ -1324,45 +1102,18 @@ function renderRows(
     const prazo = s.data_pagamento || s.prazo_estimado || "";
     rows.push(
       <TableRow key={s.id} className="hover:bg-muted/40">
-        <TableCell>
-          <Checkbox
-            checked={selecionados.has(s.id)}
-            onCheckedChange={() => toggleSel(s.id)}
-          />
-        </TableCell>
+        <TableCell><Checkbox checked={selecionados.has(s.id)} onCheckedChange={() => toggleSel(s.id)} /></TableCell>
         <TableCell>{s.setor}</TableCell>
         <TableCell>{s.solicitante}</TableCell>
         <TableCell>{s.fornecedor ?? "—"}</TableCell>
-        <TableCell className="max-w-[180px] truncate">
-          {centroNome(s.centro_custo_id)}
-        </TableCell>
-        <TableCell>
-          <Badge variant="outline" className="text-[10px]">
-            {prioridadeLabels[s.nivel_prioridade as NivelPrioridade] || s.nivel_prioridade}
-          </Badge>
-        </TableCell>
-        <TableCell>
-          <Badge variant="secondary" className="text-[10px]">
-            {statusLabels[s.status as StatusSolicitacao] || s.status}
-          </Badge>
-        </TableCell>
-        <TableCell className="text-xs">
-          {prazo ? prazo.slice(8, 10) + "/" + prazo.slice(5, 7) + "/" + prazo.slice(0, 4) : "—"}
-        </TableCell>
-        <TableCell className="text-right font-medium">
-          {formatBRL(Number(s.valor ?? 0))}
-        </TableCell>
+        <TableCell className="max-w-[180px] truncate">{centroNome(s.centro_custo_id)}</TableCell>
+        <TableCell><Badge variant="outline" className="text-[10px]">{prioridadeLabels[s.nivel_prioridade as NivelPrioridade] || s.nivel_prioridade}</Badge></TableCell>
+        <TableCell><Badge variant="secondary" className="text-[10px]">{statusLabels[s.status as StatusSolicitacao] || s.status}</Badge></TableCell>
+        <TableCell className="text-xs">{prazo ? prazo.slice(8, 10) + "/" + prazo.slice(5, 7) + "/" + prazo.slice(0, 4) : "—"}</TableCell>
+        <TableCell className="text-right font-medium">{formatBRL(Number(s.valor ?? 0))}</TableCell>
         {onRemove && (
           <TableCell className="text-right">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              onClick={() => onRemove(s.id)}
-              title="Remover do carrinho"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onRemove(s.id)} title="Remover do carrinho"><X className="h-4 w-4" /></Button>
           </TableCell>
         )}
       </TableRow>,
@@ -1397,9 +1148,7 @@ function KpiMini({
     <div className="border rounded-lg p-3 space-y-1">
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">{label}</span>
-        <Badge variant="outline" className="text-[10px]">
-          {qtd}
-        </Badge>
+        <Badge variant="outline" className="text-[10px]">{qtd}</Badge>
       </div>
       <div className={`text-lg font-semibold ${toneCls}`}>{formatBRL(valor)}</div>
       {footer && <div className="text-[11px] text-muted-foreground">{footer}</div>}
