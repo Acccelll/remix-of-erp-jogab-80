@@ -9,7 +9,18 @@ import tseslint from "typescript-eslint";
 // para não travar CI enquanto a modernização segue. Aumentar severidade
 // gradualmente em ondas futuras (QC-003+).
 export default tseslint.config(
-  { ignores: ["dist", "coverage", "playwright-report", "test-results"] },
+  {
+    ignores: [
+      "dist",
+      "coverage",
+      "playwright-report",
+      "test-results",
+      // Bundle auto-gerado pelo @lovable.dev/mcp-js. O código-fonte correspondente
+      // permanece validado em src/lib/mcp/**; lintar o bundle gerado introduz
+      // falsos bloqueios que reaparecem a cada regeneração do plugin.
+      "supabase/functions/mcp/index.ts",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

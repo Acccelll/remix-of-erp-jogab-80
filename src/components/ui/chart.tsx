@@ -14,7 +14,6 @@
 export * from "recharts";
 
 import { Tooltip, type TooltipProps } from "recharts";
-import { createElement } from "react";
 
 /** Paleta canônica — usa variáveis CSS já definidas no design-system. */
 export const CHART_COLORS = {
@@ -50,8 +49,12 @@ export const CHART_COLORS = {
   ] as const,
 } as const;
 
+type AppTooltipValue = number | string | readonly (number | string)[];
+type AppTooltipName = number | string;
+type AppTooltipProps = TooltipProps<AppTooltipValue, AppTooltipName>;
+
 /** Estilo base para <Tooltip /> do Recharts alinhado aos tokens do tema. */
-export const APP_TOOLTIP_STYLE: Partial<TooltipProps<number, string>> = {
+export const APP_TOOLTIP_STYLE: Partial<AppTooltipProps> = {
   contentStyle: {
     background: "hsl(var(--popover))",
     color: "hsl(var(--popover-foreground))",
@@ -65,6 +68,6 @@ export const APP_TOOLTIP_STYLE: Partial<TooltipProps<number, string>> = {
 };
 
 /** Tooltip padronizado — substitui `<Tooltip />` cru para garantir tema consistente. */
-export function AppTooltip(props: TooltipProps<number, string>) {
-  return createElement(Tooltip, { ...APP_TOOLTIP_STYLE, ...props });
+export function AppTooltip(props: AppTooltipProps) {
+  return <Tooltip {...APP_TOOLTIP_STYLE} {...props} />;
 }

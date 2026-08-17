@@ -1,3 +1,4 @@
+/** @module-kind orchestration */
 import { auth, defineMcp } from "@lovable.dev/mcp-js";
 import listObras from "./tools/list-obras";
 import getObra from "./tools/get-obra";

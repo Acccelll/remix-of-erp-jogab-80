@@ -1,3 +1,4 @@
+/** @module-kind orchestration */
 import { suprimentosRepo } from "@/lib/repositories/suprimentos";
 import type {
   EstoqueProvider,

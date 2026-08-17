@@ -1,3 +1,4 @@
+/** @module-kind pure */
 import { round2 } from "@/lib/core/money";
 import type { FinLinha } from "@/lib/financeiro-totvs/agregacoes";
 import type { EvmAcReal } from "./evm";

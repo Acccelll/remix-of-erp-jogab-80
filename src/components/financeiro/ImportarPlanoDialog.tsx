@@ -160,7 +160,10 @@ export default function ImportarPlanoDialog({
   const stats = useMemo(() => {
     let novos = 0;
     let existentes = 0;
-    for (const r of rows) (r.exists ? existentes++ : novos++);
+    for (const r of rows) {
+      if (r.exists) existentes += 1;
+      else novos += 1;
+    }
     return { novos, existentes, total: rows.length };
   }, [rows]);
 
@@ -205,7 +208,10 @@ export default function ImportarPlanoDialog({
             .from("plano_contas")
             .upsert(batch, { onConflict: "cod_natureza" });
           if (error) throw error;
-          for (const r of grupos.get(n)!) r.exists ? atualizados++ : inseridos++;
+          for (const r of grupos.get(n)!) {
+            if (r.exists) atualizados += 1;
+            else inseridos += 1;
+          }
         }
       } else {
         // centros: define categoria como descricao do ancestor de nível 1;
@@ -246,7 +252,10 @@ export default function ImportarPlanoDialog({
             .upsert(slice, { onConflict: "owner_id,codigo" });
           if (error) throw error;
         }
-        for (const r of alvos) r.exists ? atualizados++ : inseridos++;
+        for (const r of alvos) {
+          if (r.exists) atualizados += 1;
+          else inseridos += 1;
+        }
       }
       toast.success(
         `Importação concluída — ${inseridos} inseridos, ${atualizados} atualizados${

@@ -1,3 +1,4 @@
+/** @module-kind io */
 /**
  * Geração de PDF do Romaneio — segue o padrão de src/lib/suprimentos/export-pdf.ts
  * (cabeçalho institucional + jspdf-autotable + rodapé paginado), por ser um
