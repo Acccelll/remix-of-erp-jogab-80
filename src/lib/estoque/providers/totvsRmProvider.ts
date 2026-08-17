@@ -1,3 +1,4 @@
+/** @module-kind io */
 import type { EstoqueProvider } from "../EstoqueProvider";
 
 /**

@@ -1,3 +1,4 @@
+/** @module-kind orchestration */
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { supabaseForUser } from "../supabase";

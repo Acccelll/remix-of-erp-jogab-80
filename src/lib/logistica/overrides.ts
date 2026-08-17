@@ -1,4 +1,4 @@
-/** @module-kind pure */
+/** @module-kind io */
 /**
  * Overrides manuais de coordenadas para colaboradores e obras.
  *

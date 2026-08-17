@@ -1,3 +1,4 @@
+/** @module-kind orchestration */
 import { useFeatureFlag } from "@/hooks/useFeatureFlag";
 import type { EstoqueProvider } from "./EstoqueProvider";
 import { estoqueInternoProvider } from "./providers/estoqueInternoProvider";

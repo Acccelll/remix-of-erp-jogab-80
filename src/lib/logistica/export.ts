@@ -1,3 +1,4 @@
+/** @module-kind io */
 /**
  * Exportação (CSV/PDF) do resultado da Logística de Colaboradores.
  * Cobre tanto a visão por obra (déficits + candidatos) quanto a
