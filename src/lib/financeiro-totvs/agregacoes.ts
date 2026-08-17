@@ -37,11 +37,14 @@ export interface FinLinha {
   data_pagamento: string | null;
   data_emissao: string | null;
   contraparte: string | null;
+  cnpj_cpf: string | null;
+  historico: string | null;
   ref_lancamento: number | null;
   centro_custo: string | null;
   desc_centro_custo: string | null;
   centro_custo_tipo: string | null; // 'obra' | 'indireto' | 'nao_classificado'
   categoria_indireta: string | null;
+  origem: string | null; // 'totvs' | 'sistema' | 'manual'
 }
 
 export interface KpisObra {

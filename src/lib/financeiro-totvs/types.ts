@@ -77,3 +77,21 @@ export const STATUS_TOTVS_LEGENDA: Record<number, string> = {
   40: "Vencido",
   56: "A Vencer",
 };
+
+/** Uma linha de rateio por natureza dentro de um título lançado manualmente. */
+export interface RateioManualInput {
+  cod_natureza: string;
+  valor_rateio: number;
+}
+
+/** Payload para `fn_criar_titulo_manual` / `fn_editar_titulo_manual`. */
+export interface TituloManualInput {
+  natureza_tipo: NaturezaTipo;
+  centro_custo: string;
+  cnpj_cpf: string | null;
+  nome: string | null;
+  data_emissao: string | null;
+  data_vencimento: string;
+  historico: string | null;
+  rateios: RateioManualInput[];
+}
