@@ -49,8 +49,12 @@ export const CHART_COLORS = {
   ] as const,
 } as const;
 
+type AppTooltipValue = number | string | Array<number | string>;
+type AppTooltipName = number | string;
+type AppTooltipProps = TooltipProps<AppTooltipValue, AppTooltipName>;
+
 /** Estilo base para <Tooltip /> do Recharts alinhado aos tokens do tema. */
-export const APP_TOOLTIP_STYLE: Partial<TooltipProps<number, string>> = {
+export const APP_TOOLTIP_STYLE: Partial<AppTooltipProps> = {
   contentStyle: {
     background: "hsl(var(--popover))",
     color: "hsl(var(--popover-foreground))",
@@ -64,6 +68,6 @@ export const APP_TOOLTIP_STYLE: Partial<TooltipProps<number, string>> = {
 };
 
 /** Tooltip padronizado — substitui `<Tooltip />` cru para garantir tema consistente. */
-export function AppTooltip(props: TooltipProps<number, string>) {
-  return <Tooltip<number, string> {...APP_TOOLTIP_STYLE} {...props} />;
+export function AppTooltip(props: AppTooltipProps) {
+  return <Tooltip {...APP_TOOLTIP_STYLE} {...props} />;
 }
