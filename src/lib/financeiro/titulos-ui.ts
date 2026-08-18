@@ -104,29 +104,28 @@ export function calcularKpisTitulos(
   titulos: TituloCanonicoResumo[],
   hoje?: string,
 ): KpisTitulos {
-  return titulos.reduce<KpisTitulos>(
-    (acc, titulo) => {
-      const status = statusVisualTitulo(titulo, hoje);
-      const emAberto = status !== "baixado" && status !== "cancelado";
-      if (emAberto && titulo.tipo === "pagar") acc.pagarAberto += titulo.saldo_aberto;
-      if (emAberto && titulo.tipo === "receber") acc.receberAberto += titulo.saldo_aberto;
-      if (status === "vencido") {
-        acc.vencidosValor += titulo.saldo_aberto;
-        acc.vencidosQuantidade += 1;
-      }
-      acc.valorBaixado += titulo.valor_baixado;
-      acc.quantidade += 1;
-      return acc;
-    },
-    {
-      pagarAberto: 0,
-      receberAberto: 0,
-      vencidosValor: 0,
-      vencidosQuantidade: 0,
-      valorBaixado: 0,
-      quantidade: 0,
-    },
-  );
+  const inicial: KpisTitulos = {
+    pagarAberto: 0,
+    receberAberto: 0,
+    vencidosValor: 0,
+    vencidosQuantidade: 0,
+    valorBaixado: 0,
+    quantidade: 0,
+  };
+
+  return titulos.reduce<KpisTitulos>((acc, titulo) => {
+    const status = statusVisualTitulo(titulo, hoje);
+    const emAberto = status !== "baixado" && status !== "cancelado";
+    if (emAberto && titulo.tipo === "pagar") acc.pagarAberto += titulo.saldo_aberto;
+    if (emAberto && titulo.tipo === "receber") acc.receberAberto += titulo.saldo_aberto;
+    if (status === "vencido") {
+      acc.vencidosValor += titulo.saldo_aberto;
+      acc.vencidosQuantidade += 1;
+    }
+    acc.valorBaixado += titulo.valor_baixado;
+    acc.quantidade += 1;
+    return acc;
+  }, inicial);
 }
 
 export function temFiltrosTitulosAtivos(filtros: FiltrosTitulos): boolean {
