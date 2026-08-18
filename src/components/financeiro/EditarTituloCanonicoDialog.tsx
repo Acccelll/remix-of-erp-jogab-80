@@ -24,6 +24,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { brl } from "@/lib/billing";
 import { financeiroRepo, planoContasRepo } from "@/lib/repositories/financeiro";
+import { listarTiposDocumentoFinanceiro } from "@/lib/repositories/financeiro-tipos-documento";
 import { editarTituloManualCanonicoV3 } from "@/lib/repositories/financeiro-titulos-manual";
 import type {
   RateioTituloRow,
@@ -98,6 +99,12 @@ export function EditarTituloCanonicoDialog({
     queryFn: () => planoContasRepo.list(),
     enabled: open,
   });
+  const { data: tiposDocumento } = useQuery({
+    queryKey: ["fin_tipos_documento_select"],
+    queryFn: listarTiposDocumentoFinanceiro,
+    enabled: open,
+  });
+
   const naturezasAtivas = useMemo(
     () => (naturezas ?? []).filter((natureza: any) => natureza.ativo !== false),
     [naturezas],
@@ -118,6 +125,21 @@ export function EditarTituloCanonicoDialog({
       })),
     [centros],
   );
+  const tipoDocumentoOptions = useMemo(() => {
+    const options = (tiposDocumento ?? []).map((tipo) => ({
+      value: tipo.codigo,
+      label: `${tipo.codigo} — ${tipo.descricao}`,
+    }));
+
+    if (tipoDocumento && !options.some((option) => option.value === tipoDocumento)) {
+      options.unshift({
+        value: tipoDocumento,
+        label: `${tipoDocumento} — Código atual não disponível no catálogo ativo`,
+      });
+    }
+
+    return options;
+  }, [tiposDocumento, tipoDocumento]);
 
   const total = useMemo(
     () => rateios.reduce((acc, item) => acc + (Number(item.valor_rateio.replace(",", ".")) || 0), 0),
@@ -189,10 +211,14 @@ export function EditarTituloCanonicoDialog({
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Tipo de Documento</Label>
-              <Input
+              <FinanceiroSearchCombobox
                 value={tipoDocumento}
-                onChange={(event) => setTipoDocumento(event.target.value)}
-                placeholder="Ex.: 04, 39, NF, BOL"
+                onValueChange={setTipoDocumento}
+                options={tipoDocumentoOptions}
+                placeholder="Selecione o tipo de documento"
+                searchPlaceholder="Pesquisar por código ou descrição…"
+                emptyText="Nenhum tipo de documento encontrado."
+                ariaLabel="Tipo de Documento"
               />
             </div>
             <div className="space-y-1.5">
