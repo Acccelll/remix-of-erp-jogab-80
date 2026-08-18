@@ -618,8 +618,11 @@ export default function PrevisaoPagamento() {
                     <TableCell className="text-xs">{c.fechado_em ? fmtData(c.fechado_em) : "—"}</TableCell>
                     <TableCell className="text-right">{c.qtd}</TableCell>
                     <TableCell className="text-right font-medium">{brl(c.total)}</TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-2 justify-end">
                       <Button size="sm" variant="outline" onClick={() => abrirDetalhe(c.id, c.titulo)}>Ver detalhe</Button>
+                      <Button size="sm" variant="outline" asChild>
+                        <Link to={`/financeiro/cnab?carrinho=${c.id}`}>Gerar remessa CNAB</Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

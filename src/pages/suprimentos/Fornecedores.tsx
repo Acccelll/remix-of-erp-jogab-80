@@ -32,6 +32,13 @@ type Fornecedor = {
   categorias: string[];
   ativo: boolean;
   updated_at: string;
+  banco_codigo: string | null;
+  agencia: string | null;
+  agencia_dv: string | null;
+  conta: string | null;
+  conta_dv: string | null;
+  tipo_conta: string | null;
+  chave_pix: string | null;
 };
 
 const CATEGORIAS = ["material", "servico", "equipamento"] as const;
@@ -71,6 +78,13 @@ const Fornecedores = () => {
   const [telefone, setTelefone] = useState("");
   const [categorias, setCategorias] = useState<string[]>([]);
   const [ativo, setAtivo] = useState(true);
+  const [bancoCodigo, setBancoCodigo] = useState("");
+  const [agencia, setAgencia] = useState("");
+  const [agenciaDv, setAgenciaDv] = useState("");
+  const [conta, setConta] = useState("");
+  const [contaDv, setContaDv] = useState("");
+  const [tipoConta, setTipoConta] = useState<"corrente" | "poupanca" | "">("");
+  const [chavePix, setChavePix] = useState("");
   const saving = createMut.isPending || updateMut.isPending;
 
   const openForm = (f?: Fornecedor) => {
@@ -84,6 +98,13 @@ const Fornecedores = () => {
       setTelefone(f.telefone ?? "");
       setCategorias(f.categorias ?? []);
       setAtivo(f.ativo);
+      setBancoCodigo(f.banco_codigo ?? "");
+      setAgencia(f.agencia ?? "");
+      setAgenciaDv(f.agencia_dv ?? "");
+      setConta(f.conta ?? "");
+      setContaDv(f.conta_dv ?? "");
+      setTipoConta((f.tipo_conta as "corrente" | "poupanca" | null) ?? "");
+      setChavePix(f.chave_pix ?? "");
     } else {
       setEditing(null);
       setRazao("");
@@ -94,6 +115,13 @@ const Fornecedores = () => {
       setTelefone("");
       setCategorias([]);
       setAtivo(true);
+      setBancoCodigo("");
+      setAgencia("");
+      setAgenciaDv("");
+      setConta("");
+      setContaDv("");
+      setTipoConta("");
+      setChavePix("");
     }
     setFormOpen(true);
   };
@@ -116,6 +144,13 @@ const Fornecedores = () => {
       telefone: telefone.trim() || null,
       categorias,
       ativo,
+      banco_codigo: bancoCodigo.trim() || null,
+      agencia: agencia.trim() || null,
+      agencia_dv: agenciaDv.trim() || null,
+      conta: conta.trim() || null,
+      conta_dv: contaDv.trim() || null,
+      tipo_conta: tipoConta || null,
+      chave_pix: chavePix.trim() || null,
     };
     try {
       if (editing) await updateMut.mutateAsync({ id: editing.id, patch: payload });
@@ -307,6 +342,57 @@ const Fornecedores = () => {
             <div className="flex items-center gap-2">
               <Switch id="forn-ativo" checked={ativo} onCheckedChange={setAtivo} />
               <Label htmlFor="forn-ativo">Ativo</Label>
+            </div>
+            <div className="pt-2 border-t border-border">
+              <p className="text-xs font-medium text-muted-foreground mb-2">
+                Dados bancários (pagamento via CNAB)
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label>Banco</Label>
+                  <Input
+                    value={bancoCodigo}
+                    onChange={(e) => setBancoCodigo(e.target.value)}
+                    placeholder="Código"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Agência</Label>
+                  <Input value={agencia} onChange={(e) => setAgencia(e.target.value)} className="mt-1" />
+                </div>
+                <div>
+                  <Label>DV Agência</Label>
+                  <Input value={agenciaDv} onChange={(e) => setAgenciaDv(e.target.value)} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Conta</Label>
+                  <Input value={conta} onChange={(e) => setConta(e.target.value)} className="mt-1" />
+                </div>
+                <div>
+                  <Label>DV Conta</Label>
+                  <Input value={contaDv} onChange={(e) => setContaDv(e.target.value)} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Tipo</Label>
+                  <div className="flex gap-2 mt-1.5">
+                    {(["corrente", "poupanca"] as const).map((t) => (
+                      <Badge
+                        key={t}
+                        variant={tipoConta === t ? "default" : "outline"}
+                        className="cursor-pointer select-none"
+                        onClick={() => setTipoConta(tipoConta === t ? "" : t)}
+                      >
+                        {t === "corrente" ? "Corrente" : "Poupança"}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-3">
+                <Label>Chave PIX</Label>
+                <Input value={chavePix} onChange={(e) => setChavePix(e.target.value)} className="mt-1" />
+              </div>
             </div>
           </div>
           <DialogFooter>

@@ -87,6 +87,7 @@ const ROTA_MAE: Record<string, string> = {
   // Abas/deep links do hub Fluxo & Dívidas
   "/financeiro/dividas": "/financeiro/fluxo",
   "/financeiro/previsao-pagamento": "/financeiro/fluxo",
+  "/financeiro/cnab": "/financeiro/fluxo",
   // Importação TOTVS virou botão dentro de Lançamentos
   "/financeiro/importar": "/financeiro/lancamentos",
   // Quadros que são a outra face dos hubs de Patrimônios/Contratos

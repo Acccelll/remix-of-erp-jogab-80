@@ -3,7 +3,7 @@
 > Auto-gerado por `scripts/db/gen-migrations-index.py` (DB-003 · Onda 1).
 > Regeração: `python3 scripts/db/gen-migrations-index.py`.
 
-Total: **256** migrations · janela: 2026-04-02 11:38 → 2026-08-13 16:15
+Total: **275** migrations · janela: 2026-04-02 11:38 → 2026-08-18 17:36
 
 | # | Data/Hora | Arquivo | Ementa (primeira linha) |
 |--:|-----------|---------|-------------------------|
@@ -263,3 +263,22 @@ Total: **256** migrations · janela: 2026-04-02 11:38 → 2026-08-13 16:15
 | 254 | 2026-08-11 11:14 | `20260811111417_38b673e7-92ff-4dd3-885f-a0afe2b30740.sql` | GRANT SELECT, INSERT, UPDATE, DELETE ON public.card_board_posicao TO authenticated; |
 | 255 | 2026-08-12 12:02 | `20260812120217_9a4d9c12-da8d-4fdc-bec0-4b037b947688.sql` | CREATE POLICY "card_membros_self_delete" ON public.card_membros |
 | 256 | 2026-08-13 16:15 | `20260813161500_3f2c8d41-9b57-4e6a-8c21-5d7ae0b91f34.sql` | Adiciona `previsao` (valor provisório) em solicitacoes_financeiras |
+| 257 | 2026-08-14 13:00 | `20260814130000_app_role_almoxarifado_frotas.sql` | Almoxarifado e Frotas viram setores atribuíveis. |
+| 258 | 2026-08-17 19:53 | `20260817195339_financeiro_titulos_core.sql` | ETAPA 1 — Núcleo operacional canônico de títulos financeiros. |
+| 259 | 2026-08-17 19:57 | `20260817195758_financeiro_titulos_manual_ui_guard.sql` | Guard temporário da UI legada de "Novo título". |
+| 260 | 2026-08-17 20:43 | `20260817204354_financeiro_titulos_core_hardening.sql` | Revisão GO da Etapa 1: fecha escrita direta, garante idempotência externa |
+| 261 | 2026-08-17 22:19 | `20260817221932_financeiro_view_consolidada.sql` | FIN-002 — Consolidação de leitura entre o legado/snapshot TOTVS e o núcleo |
+| 262 | 2026-08-18 00:06 | `20260818000615_financeiro_titulos_manual_enable.sql` | FIN-003 — Habilitação definitiva da criação manual no núcleo canônico. |
+| 263 | 2026-08-18 00:08 | `20260818000839_financeiro_titulos_manual_rpc_private_impl.sql` | FIN-003 hardening — preserva as tabelas canônicas como somente leitura para |
+| 264 | 2026-08-18 01:05 | `20260818010533_financeiro_rateios_integridade.sql` | ETAPA 2 — Rateios: Natureza × Centro de Custo × Obra com integridade transacional. |
+| 265 | 2026-08-18 01:21 | `20260818012104_financeiro_baixas_ledger.sql` | ETAPA 3 — Ledger canônico de baixas 1:N e saldo derivado. |
+| 266 | 2026-08-18 01:44 | `20260818014430_financeiro_seguranca_auditoria.sql` | ETAPA 4 — Segurança e auditoria do núcleo financeiro canônico. |
+| 267 | 2026-08-18 04:03 | `20260818040310_financeiro_operacoes_estorno_edicao_cancelamento.sql` | ETAPA 6 — Operações canônicas: edição, cancelamento/reabertura e estorno imutável. |
+| 268 | 2026-08-18 04:12 | `20260818041251_financeiro_auditoria_status_operacoes_fix.sql` | ETAPA 6 — Correção semântica da auditoria de status. |
+| 269 | 2026-08-18 11:10 | `20260818111009_financeiro_manual_documento_v3.sql` | Ajustes pre-Etapa 8: identificacao documental obrigatoria nos titulos manuais. |
+| 270 | 2026-08-18 12:09 | `20260818120907_financeiro_tipos_documento_totvs.sql` | CREATE TABLE IF NOT EXISTS public.financeiro_tipos_documento ( |
+| 271 | 2026-08-18 14:27 | `20260818142706_a283402b-3b49-422d-835e-b4df6c5314f8.sql` | Fase 1 (evolução de Suprimentos): categoria/subcategoria em insumos, |
+| 272 | 2026-08-18 14:50 | `20260818145035_b4a6a69d-c15c-4cd4-b54e-b45d35c956e0.sql` | Fase 2+3 (evolução de Suprimentos): Almoxarifado formal (depósitos) + |
+| 273 | 2026-08-18 16:21 | `20260818162128_01eb8975-6451-4938-ad4c-64f2814f5120.sql` | Fase 4 (evolução de Suprimentos): Nota fiscal de entrada + rastreio. |
+| 274 | 2026-08-18 17:33 | `20260818173328_88c15fcf-4cba-4694-a103-f2c29146c5bd.sql` | Fase 5 (evolução de Financeiro): CNAB 240 — remessa, retorno e conciliação. |
+| 275 | 2026-08-18 17:36 | `20260818173634_646c20a5-418e-4454-b65e-67f4c1b69e70.sql` | Restringe o bucket privado 'cnab' (arquivos de remessa/retorno bancário) a |
