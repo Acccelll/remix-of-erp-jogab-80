@@ -37,7 +37,13 @@ function hojeIso(): string {
 }
 
 function parseValor(value: string): number {
-  const normalizado = value.trim().replace(/\./g, "").replace(",", ".");
+  const bruto = value.trim().replace(/\s/g, "");
+  if (!bruto) return 0;
+
+  // Aceita tanto 1.234,56 (pt-BR) quanto 1234.56 (decimal simples).
+  const normalizado = bruto.includes(",")
+    ? bruto.replace(/\./g, "").replace(",", ".")
+    : bruto;
   const parsed = Number(normalizado);
   return Number.isFinite(parsed) ? parsed : 0;
 }
