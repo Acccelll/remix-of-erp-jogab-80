@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CircleDollarSign, Clock3, WalletCards } from "lucide-react";
+import { CircleDollarSign, Clock3 } from "lucide-react";
 
+import { MovimentosTituloTab } from "@/components/financeiro/MovimentosTituloTab";
 import { RegistrarBaixaDialog } from "@/components/financeiro/RegistrarBaixaDialog";
+import { TituloOperacoesActions } from "@/components/financeiro/TituloOperacoesActions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,20 +27,18 @@ import {
 import { brl } from "@/lib/billing";
 import { fmtDataHora } from "@/lib/core/date";
 import {
-  financeiroTitulosKeys,
-  listarBaixasTitulo,
-  listarEventosTitulo,
-  listarRateiosTitulo,
-  type BaixaTituloRow,
-  type EventoTituloRow,
-  type RateioTituloRow,
-  type TituloCanonicoResumo,
-} from "@/lib/repositories/financeiro-titulos";
-import {
   documentoTitulo,
   STATUS_TITULO_LABEL,
   statusVisualTitulo,
 } from "@/lib/financeiro/titulos-ui";
+import {
+  financeiroTitulosKeys,
+  listarEventosTitulo,
+  listarRateiosTitulo,
+  type EventoTituloRow,
+  type RateioTituloRow,
+  type TituloCanonicoResumo,
+} from "@/lib/repositories/financeiro-titulos";
 
 interface TituloDetalheSheetProps {
   titulo: TituloCanonicoResumo | null;
@@ -51,10 +51,13 @@ const EVENTO_LABELS: Record<string, string> = {
   titulo_criado: "Título criado",
   titulo_alterado: "Título alterado",
   status_alterado: "Status alterado",
+  titulo_cancelado: "Título cancelado",
+  titulo_reaberto: "Título reaberto",
   rateio_criado: "Rateio criado",
   rateio_alterado: "Rateio alterado",
   rateio_removido: "Rateio removido",
   baixa_registrada: "Baixa registrada",
+  baixa_estornada: "Baixa estornada",
 };
 
 function formatarData(value: string | null | undefined): string {
@@ -102,11 +105,6 @@ export function TituloDetalheSheet({
     queryFn: () => listarRateiosTitulo(tituloId),
     enabled: open && !!tituloId,
   });
-  const baixasQuery = useQuery({
-    queryKey: financeiroTitulosKeys.baixas(tituloId),
-    queryFn: () => listarBaixasTitulo(tituloId),
-    enabled: open && !!tituloId,
-  });
   const eventosQuery = useQuery({
     queryKey: financeiroTitulosKeys.eventos(tituloId),
     queryFn: () => listarEventosTitulo(tituloId),
@@ -124,9 +122,10 @@ export function TituloDetalheSheet({
   const podeBaixar =
     podeOperar && titulo.saldo_aberto > 0 && status !== "cancelado" && status !== "baixado";
 
-  async function atualizarAposBaixa() {
+  async function atualizarOperacao() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: financeiroTitulosKeys.list() }),
+      queryClient.invalidateQueries({ queryKey: financeiroTitulosKeys.rateios(titulo.id) }),
       queryClient.invalidateQueries({ queryKey: financeiroTitulosKeys.baixas(titulo.id) }),
       queryClient.invalidateQueries({ queryKey: financeiroTitulosKeys.eventos(titulo.id) }),
     ]);
@@ -152,6 +151,14 @@ export function TituloDetalheSheet({
                 <p className="mt-1 truncate text-sm text-muted-foreground">
                   {titulo.nome_fantasia || titulo.nome || "Contraparte não informada"}
                 </p>
+                <div className="mt-3">
+                  <TituloOperacoesActions
+                    titulo={titulo}
+                    rateios={rateiosQuery.data ?? []}
+                    podeOperar={podeOperar && !rateiosQuery.isLoading && !rateiosQuery.isError}
+                    onSuccess={atualizarOperacao}
+                  />
+                </div>
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-xs text-muted-foreground">Saldo em aberto</p>
@@ -178,7 +185,7 @@ export function TituloDetalheSheet({
                 <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Valor original</p><p className="mt-1 text-lg font-semibold tabular-nums">{brl(titulo.valor_original)}</p></CardContent></Card>
                 <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Valor líquido</p><p className="mt-1 text-lg font-semibold tabular-nums">{brl(titulo.valor_liquido)}</p></CardContent></Card>
                 <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Baixado</p><p className="mt-1 text-lg font-semibold tabular-nums">{brl(titulo.valor_baixado)}</p></CardContent></Card>
-                <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Baixas</p><p className="mt-1 text-lg font-semibold tabular-nums">{titulo.qtd_baixas}</p></CardContent></Card>
+                <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Baixas ativas</p><p className="mt-1 text-lg font-semibold tabular-nums">{titulo.qtd_baixas}</p></CardContent></Card>
               </div>
 
               <dl className="grid gap-x-6 gap-y-4 rounded-lg border p-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -234,31 +241,7 @@ export function TituloDetalheSheet({
             </TabsContent>
 
             <TabsContent value="baixas" className="mt-5 space-y-3">
-              {baixasQuery.isLoading ? (
-                <div className="space-y-2"><Skeleton className="h-10 w-full" /><Skeleton className="h-20 w-full" /></div>
-              ) : baixasQuery.isError ? (
-                <QueryError message="Não foi possível carregar as baixas deste título." />
-              ) : (baixasQuery.data?.length ?? 0) === 0 ? (
-                <div className="rounded-lg border border-dashed p-8 text-center"><WalletCards className="mx-auto h-8 w-8 text-muted-foreground/50" /><p className="mt-2 text-sm font-medium">Nenhuma baixa registrada</p><p className="mt-1 text-xs text-muted-foreground">O ledger deste título ainda não possui movimentações.</p></div>
-              ) : (
-                <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Data</TableHead><TableHead className="text-right">Principal</TableHead><TableHead className="text-right">Desconto</TableHead><TableHead className="text-right">Juros</TableHead><TableHead className="text-right">Multa</TableHead><TableHead>Forma / Referência</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      {(baixasQuery.data as BaixaTituloRow[]).map((baixa) => (
-                        <TableRow key={baixa.id}>
-                          <TableCell>{formatarData(baixa.data_baixa)}</TableCell>
-                          <TableCell className="text-right font-medium tabular-nums">{brl(baixa.valor_principal)}</TableCell>
-                          <TableCell className="text-right tabular-nums">{brl(baixa.valor_desconto)}</TableCell>
-                          <TableCell className="text-right tabular-nums">{brl(baixa.valor_juros)}</TableCell>
-                          <TableCell className="text-right tabular-nums">{brl(baixa.valor_multa)}</TableCell>
-                          <TableCell><div className="text-sm">{baixa.forma_pagamento || "—"}</div><div className="text-xs text-muted-foreground">{baixa.referencia || baixa.observacao || ""}</div></TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
+              <MovimentosTituloTab titulo={titulo} podeOperar={podeOperar} onSuccess={atualizarOperacao} />
             </TabsContent>
 
             <TabsContent value="historico" className="mt-5">
@@ -289,7 +272,7 @@ export function TituloDetalheSheet({
         </SheetContent>
       </Sheet>
 
-      <RegistrarBaixaDialog titulo={titulo} open={baixaOpen} onOpenChange={setBaixaOpen} onSuccess={atualizarAposBaixa} />
+      <RegistrarBaixaDialog titulo={titulo} open={baixaOpen} onOpenChange={setBaixaOpen} onSuccess={atualizarOperacao} />
     </>
   );
 }
