@@ -1,5 +1,5 @@
 /** @module-kind io */
-// Queries centralizadas do módulo Financeiro TOTVS.
+// Queries centralizadas do módulo Financeiro TOTVS/ERP.
 // ARC-003 — acesso a dados delegado a `financeiroTotvsRepo`.
 
 import { queryKey } from "@/lib/query-keys";
@@ -20,9 +20,10 @@ export const finKeys = {
   evolucao: (filtros: { obraId?: string | null } = {}) => queryKey("fin_evolucao", filtros),
 };
 
-// Colunas exatas usadas por FinLinha — evita puxar campos da view não consumidos.
+// Colunas exatas usadas por FinLinha — evita puxar campos não consumidos.
 const FIN_LINHA_COLS = [
   "lancamento_id",
+  "titulo_id",
   "obra_id",
   "obra_nome",
   "obra_codigo",
@@ -36,6 +37,11 @@ const FIN_LINHA_COLS = [
   "valor_liquido",
   "valor_baixado",
   "valor_rateio",
+  "titulo_valor_liquido",
+  "titulo_valor_baixado",
+  "titulo_saldo_aberto",
+  "titulo_valor_movimentado",
+  "qtd_baixas",
   "mes_competencia",
   "data_vencimento",
   "data_pagamento",
@@ -87,12 +93,12 @@ export async function fetchEvolucaoRollup(
   return rows as unknown as RollupLinha[];
 }
 
-/** Linhas da view do snapshot mais recente (todas as obras do usuário). */
+/** Linhas operacionais: legado/TOTVS + títulos ERP com saldo derivado do ledger. */
 export async function fetchFinanceiroGeral(): Promise<FinLinha[]> {
   return fetchAllFinanceiroRows();
 }
 
-/** Linhas da view filtradas por obra. */
+/** Linhas operacionais filtradas por obra. */
 export async function fetchFinanceiroObra(obraId: string): Promise<FinLinha[]> {
   return fetchAllFinanceiroRows(obraId);
 }
