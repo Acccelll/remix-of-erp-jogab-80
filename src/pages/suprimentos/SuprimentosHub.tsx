@@ -17,12 +17,14 @@ import {
   Settings,
   ShieldAlert,
   Truck,
+  Warehouse,
 } from "lucide-react";
 import HubTabs from "@/components/common/HubTabs";
 
 const Compras = lazy(() => import("@/pages/suprimentos/QuadroCompras"));
 const Producao = lazy(() => import("@/pages/suprimentos/QuadroProducao"));
 const Requisicoes = lazy(() => import("@/pages/suprimentos/Requisicoes"));
+const Almoxarifado = lazy(() => import("@/pages/suprimentos/Almoxarifado"));
 const Cotacoes = lazy(() => import("@/pages/suprimentos/Cotacoes"));
 const OrdensCompra = lazy(() => import("@/pages/suprimentos/OrdensCompra"));
 const Estoque = lazy(() => import("@/pages/suprimentos/Estoque"));
@@ -42,6 +44,7 @@ export default function SuprimentosHub() {
         { value: "compras", label: "Compras", icon: Kanban, element: <Compras /> },
         { value: "producao", label: "Produção", icon: Kanban, element: <Producao /> },
         { value: "requisicoes", label: "Requisições", icon: ClipboardList, element: <Requisicoes /> },
+        { value: "almoxarifado", label: "Almoxarifado", icon: Warehouse, element: <Almoxarifado /> },
         { value: "cotacoes", label: "Cotações", icon: Scale, element: <Cotacoes /> },
         { value: "ordens", label: "Ordens", icon: FileText, element: <OrdensCompra /> },
         { value: "estoque", label: "Estoque", icon: Boxes, element: <Estoque /> },
