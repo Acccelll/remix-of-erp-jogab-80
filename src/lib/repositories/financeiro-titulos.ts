@@ -25,3 +25,83 @@ export async function criarTituloManualCanonico(input: TituloManualInput): Promi
   if (error) throw new Error(error.message);
   return data as string;
 }
+
+export interface BaixaTituloInput {
+  titulo_id: string;
+  valor_principal: number;
+  data_baixa: string;
+  valor_desconto?: number;
+  valor_juros?: number;
+  valor_multa?: number;
+  valor_acrescimos?: number;
+  valor_retencoes?: number;
+  observacao?: string | null;
+  forma_pagamento?: string | null;
+  referencia?: string | null;
+  origem_tipo?: string;
+  origem_ref?: string | null;
+}
+
+export interface BaixaTituloRow {
+  id: string;
+  titulo_id: string;
+  data_baixa: string;
+  valor_principal: number;
+  valor_desconto: number;
+  valor_juros: number;
+  valor_multa: number;
+  valor_acrescimos: number;
+  valor_retencoes: number;
+  forma_pagamento: string | null;
+  referencia: string | null;
+  observacao: string | null;
+  origem_tipo: string;
+  origem_ref: string | null;
+  criado_em: string;
+  criado_por: string | null;
+}
+
+/** Registra uma baixa parcial ou total no ledger canônico do título. */
+export async function baixarTituloCanonico(input: BaixaTituloInput): Promise<string> {
+  const { data, error } = await withDeadline(
+    (supabase as any).rpc("fn_baixar_titulo", {
+      p_titulo_id: input.titulo_id,
+      p_valor_principal: input.valor_principal,
+      p_data_baixa: input.data_baixa,
+      p_valor_desconto: input.valor_desconto ?? 0,
+      p_valor_juros: input.valor_juros ?? 0,
+      p_valor_multa: input.valor_multa ?? 0,
+      p_valor_acrescimos: input.valor_acrescimos ?? 0,
+      p_valor_retencoes: input.valor_retencoes ?? 0,
+      p_observacao: input.observacao ?? null,
+      p_forma_pagamento: input.forma_pagamento ?? null,
+      p_referencia: input.referencia ?? null,
+      p_origem_tipo: input.origem_tipo ?? "manual",
+      p_origem_ref: input.origem_ref ?? null,
+    }),
+    15_000,
+    "financeiro.baixarTituloCanonico",
+  );
+
+  if (error) throw new Error(error.message);
+  return data as string;
+}
+
+/** Histórico cronológico de baixas do título; base para ficha completa da Etapa 5. */
+export async function listarBaixasTitulo(tituloId: string): Promise<BaixaTituloRow[]> {
+  const { data, error } = await withDeadline(
+    (supabase as any)
+      .from("financeiro_titulo_baixas")
+      .select(
+        "id,titulo_id,data_baixa,valor_principal,valor_desconto,valor_juros,valor_multa,valor_acrescimos,valor_retencoes,forma_pagamento,referencia,observacao,origem_tipo,origem_ref,criado_em,criado_por",
+      )
+      .eq("titulo_id", tituloId)
+      .order("data_baixa", { ascending: true })
+      .order("criado_em", { ascending: true }),
+    15_000,
+    "financeiro.listarBaixasTitulo",
+  );
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as BaixaTituloRow[];
+}
