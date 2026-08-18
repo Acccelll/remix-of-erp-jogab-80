@@ -3,10 +3,303 @@ import { supabase } from "@/integrations/supabase/client";
 import { withDeadline } from "@/lib/core/http/withDeadline";
 import type { TituloManualInput } from "@/lib/financeiro-totvs/types";
 
+const FINANCEIRO_TITULOS_ROOT = ["financeiro", "titulos-canonicos"] as const;
+
+export const financeiroTitulosKeys = {
+  all: FINANCEIRO_TITULOS_ROOT,
+  list: () => [...FINANCEIRO_TITULOS_ROOT, "list"] as const,
+  detail: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId] as const,
+  rateios: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId, "rateios"] as const,
+  baixas: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId, "baixas"] as const,
+  eventos: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId, "eventos"] as const,
+};
+
+export interface TituloCanonicoRow {
+  id: string;
+  tipo: "pagar" | "receber";
+  empresa_id: string | null;
+  filial: number | null;
+  contraparte_id: string | null;
+  cnpj_cpf: string | null;
+  nome: string | null;
+  nome_fantasia: string | null;
+  tipo_documento: string | null;
+  numero_documento: string | null;
+  serie_documento: string | null;
+  parcela_numero: number | null;
+  parcela_total: number | null;
+  data_emissao: string;
+  data_competencia: string | null;
+  data_vencimento: string;
+  data_previsao_baixa: string | null;
+  valor_original: number;
+  valor_desconto: number;
+  valor_juros: number;
+  valor_multa: number;
+  valor_acrescimos: number;
+  valor_retencoes: number;
+  valor_liquido: number;
+  centro_custo: string | null;
+  obra_id: string | null;
+  historico: string | null;
+  observacao: string | null;
+  origem_tipo: string;
+  origem_ref: string | null;
+  status: "aberto" | "parcial" | "baixado" | "cancelado";
+  criado_em: string;
+  criado_por: string | null;
+  atualizado_em: string;
+  atualizado_por: string | null;
+  cancelado_em: string | null;
+  cancelado_por: string | null;
+}
+
+export interface TituloSaldoRow {
+  titulo_id: string;
+  valor_liquido: number;
+  valor_baixado: number;
+  saldo_aberto: number;
+  valor_movimentado: number;
+  qtd_baixas: number;
+  data_primeira_baixa: string | null;
+  data_ultima_baixa: string | null;
+  status_calculado: "aberto" | "parcial" | "baixado" | "cancelado";
+}
+
+export interface TituloCanonicoResumo extends TituloCanonicoRow {
+  valor_baixado: number;
+  saldo_aberto: number;
+  valor_movimentado: number;
+  qtd_baixas: number;
+  data_primeira_baixa: string | null;
+  data_ultima_baixa: string | null;
+  status_calculado: "aberto" | "parcial" | "baixado" | "cancelado";
+}
+
+export interface RateioTituloRow {
+  id: string;
+  titulo_id: string;
+  cod_natureza: string;
+  desc_natureza: string | null;
+  centro_custo: string;
+  desc_centro_custo: string | null;
+  obra_id: string | null;
+  obra_codigo: string | null;
+  obra_nome: string | null;
+  valor: number | null;
+  percentual: number | null;
+  criado_em: string;
+  criado_por: string | null;
+}
+
+export interface EventoTituloRow {
+  id: string;
+  titulo_id: string;
+  baixa_id: string | null;
+  entidade: string;
+  entidade_id: string;
+  evento: string;
+  ator_id: string | null;
+  ator_login: string | null;
+  origem: string;
+  dados_antes: Record<string, unknown> | null;
+  dados_depois: Record<string, unknown> | null;
+  metadata: Record<string, unknown>;
+  criado_em: string;
+}
+
+interface RateioTituloRaw {
+  id: string;
+  titulo_id: string;
+  cod_natureza: string;
+  centro_custo: string;
+  obra_id: string | null;
+  valor: number | string | null;
+  percentual: number | string | null;
+  criado_em: string;
+  criado_por: string | null;
+}
+
+interface NaturezaLookupRow {
+  cod_natureza: string;
+  descricao: string | null;
+}
+
+interface CentroCustoLookupRow {
+  codigo: string;
+  descricao: string | null;
+}
+
+interface ObraLookupRow {
+  id: string;
+  codigo: string | null;
+  nome: string | null;
+}
+
+const TITULO_COLS =
+  "id,tipo,empresa_id,filial,contraparte_id,cnpj_cpf,nome,nome_fantasia,tipo_documento,numero_documento,serie_documento,parcela_numero,parcela_total,data_emissao,data_competencia,data_vencimento,data_previsao_baixa,valor_original,valor_desconto,valor_juros,valor_multa,valor_acrescimos,valor_retencoes,valor_liquido,centro_custo,obra_id,historico,observacao,origem_tipo,origem_ref,status,criado_em,criado_por,atualizado_em,atualizado_por,cancelado_em,cancelado_por";
+
+const SALDO_COLS =
+  "titulo_id,valor_liquido,valor_baixado,saldo_aberto,valor_movimentado,qtd_baixas,data_primeira_baixa,data_ultima_baixa,status_calculado";
+
+function numeric(value: unknown): number {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+async function listarTitulosRows(pageSize = 1000): Promise<TituloCanonicoRow[]> {
+  const rows: TituloCanonicoRow[] = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await (supabase as any)
+      .from("financeiro_titulos")
+      .select(TITULO_COLS)
+      .order("data_vencimento", { ascending: true })
+      .order("criado_em", { ascending: false })
+      .range(from, from + pageSize - 1);
+    if (error) throw new Error(error.message);
+
+    const page = (data ?? []) as TituloCanonicoRow[];
+    rows.push(
+      ...page.map((row) => ({
+        ...row,
+        valor_original: numeric(row.valor_original),
+        valor_desconto: numeric(row.valor_desconto),
+        valor_juros: numeric(row.valor_juros),
+        valor_multa: numeric(row.valor_multa),
+        valor_acrescimos: numeric(row.valor_acrescimos),
+        valor_retencoes: numeric(row.valor_retencoes),
+        valor_liquido: numeric(row.valor_liquido),
+      })),
+    );
+    if (page.length < pageSize) break;
+  }
+  return rows;
+}
+
+async function listarSaldosRows(pageSize = 1000): Promise<TituloSaldoRow[]> {
+  const rows: TituloSaldoRow[] = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await (supabase as any)
+      .from("vw_financeiro_titulo_saldos")
+      .select(SALDO_COLS)
+      .range(from, from + pageSize - 1);
+    if (error) throw new Error(error.message);
+
+    const page = (data ?? []) as TituloSaldoRow[];
+    rows.push(
+      ...page.map((row) => ({
+        ...row,
+        valor_liquido: numeric(row.valor_liquido),
+        valor_baixado: numeric(row.valor_baixado),
+        saldo_aberto: numeric(row.saldo_aberto),
+        valor_movimentado: numeric(row.valor_movimentado),
+        qtd_baixas: numeric(row.qtd_baixas),
+      })),
+    );
+    if (page.length < pageSize) break;
+  }
+  return rows;
+}
+
 /**
- * Cria título manual no núcleo canônico com rateio por linha
- * (Natureza × Centro de Custo; obra é resolvida no banco pelo CC).
+ * Lista os títulos do núcleo canônico com saldo agregado do ledger de baixas.
+ * As duas fontes são lidas em paralelo e unidas em memória, evitando N+1.
  */
+export async function listarTitulosCanonicos(): Promise<TituloCanonicoResumo[]> {
+  const [titulos, saldos] = await Promise.all([listarTitulosRows(), listarSaldosRows()]);
+  const saldoPorTitulo = new Map<string, TituloSaldoRow>();
+  for (const saldo of saldos) saldoPorTitulo.set(saldo.titulo_id, saldo);
+
+  return titulos.map((titulo) => {
+    const saldo = saldoPorTitulo.get(titulo.id);
+    return {
+      ...titulo,
+      valor_baixado: saldo?.valor_baixado ?? 0,
+      saldo_aberto: saldo?.saldo_aberto ?? titulo.valor_liquido,
+      valor_movimentado: saldo?.valor_movimentado ?? 0,
+      qtd_baixas: saldo?.qtd_baixas ?? 0,
+      data_primeira_baixa: saldo?.data_primeira_baixa ?? null,
+      data_ultima_baixa: saldo?.data_ultima_baixa ?? null,
+      status_calculado: saldo?.status_calculado ?? titulo.status,
+    };
+  });
+}
+
+/**
+ * Rateios do título enriquecidos em lote com Natureza, Centro de Custo e Obra.
+ * Nenhuma consulta é feita por linha.
+ */
+export async function listarRateiosTitulo(tituloId: string): Promise<RateioTituloRow[]> {
+  const { data, error } = await withDeadline(
+    (supabase as any)
+      .from("financeiro_titulo_rateios")
+      .select("id,titulo_id,cod_natureza,centro_custo,obra_id,valor,percentual,criado_em,criado_por")
+      .eq("titulo_id", tituloId)
+      .order("criado_em", { ascending: true }),
+    15_000,
+    "financeiro.listarRateiosTitulo",
+  );
+  if (error) throw new Error(error.message);
+
+  const rows = (data ?? []) as RateioTituloRaw[];
+  if (!rows.length) return [];
+
+  const naturezas = [...new Set(rows.map((row) => row.cod_natureza).filter(Boolean))];
+  const centros = [...new Set(rows.map((row) => row.centro_custo).filter(Boolean))];
+  const obras = [...new Set(rows.map((row) => row.obra_id).filter((id): id is string => Boolean(id)))];
+
+  const [naturezasRes, centrosRes, obrasRes] = await Promise.all([
+    naturezas.length
+      ? (supabase as any).from("plano_contas").select("cod_natureza,descricao").in("cod_natureza", naturezas)
+      : Promise.resolve({ data: [] as NaturezaLookupRow[], error: null }),
+    centros.length
+      ? (supabase as any).from("centros_custo_totvs").select("codigo,descricao").in("codigo", centros)
+      : Promise.resolve({ data: [] as CentroCustoLookupRow[], error: null }),
+    obras.length
+      ? (supabase as any).from("obras").select("id,codigo,nome").in("id", obras)
+      : Promise.resolve({ data: [] as ObraLookupRow[], error: null }),
+  ]);
+
+  if (naturezasRes.error) throw new Error(naturezasRes.error.message);
+  if (centrosRes.error) throw new Error(centrosRes.error.message);
+  if (obrasRes.error) throw new Error(obrasRes.error.message);
+
+  const naturezaMap = new Map<string, string | null>();
+  for (const row of (naturezasRes.data ?? []) as NaturezaLookupRow[]) {
+    naturezaMap.set(String(row.cod_natureza), row.descricao ?? null);
+  }
+
+  const centroMap = new Map<string, string | null>();
+  for (const row of (centrosRes.data ?? []) as CentroCustoLookupRow[]) {
+    centroMap.set(String(row.codigo), row.descricao ?? null);
+  }
+
+  const obraMap = new Map<string, ObraLookupRow>();
+  for (const row of (obrasRes.data ?? []) as ObraLookupRow[]) {
+    obraMap.set(String(row.id), row);
+  }
+
+  return rows.map((row) => {
+    const obra = row.obra_id ? obraMap.get(row.obra_id) : undefined;
+    return {
+      id: row.id,
+      titulo_id: row.titulo_id,
+      cod_natureza: row.cod_natureza,
+      desc_natureza: naturezaMap.get(row.cod_natureza) ?? null,
+      centro_custo: row.centro_custo,
+      desc_centro_custo: centroMap.get(row.centro_custo) ?? null,
+      obra_id: row.obra_id,
+      obra_codigo: obra?.codigo ?? null,
+      obra_nome: obra?.nome ?? null,
+      valor: row.valor == null ? null : numeric(row.valor),
+      percentual: row.percentual == null ? null : numeric(row.percentual),
+      criado_em: row.criado_em,
+      criado_por: row.criado_por,
+    };
+  });
+}
+
+/** Cria título manual no núcleo canônico com rateio por linha. */
 export async function criarTituloManualCanonico(input: TituloManualInput): Promise<string> {
   const { data, error } = await withDeadline(
     (supabase as any).rpc("fn_criar_titulo_manual_v2", {
@@ -87,7 +380,7 @@ export async function baixarTituloCanonico(input: BaixaTituloInput): Promise<str
   return data as string;
 }
 
-/** Histórico cronológico de baixas do título; base para ficha completa da Etapa 5. */
+/** Histórico cronológico de baixas do título. */
 export async function listarBaixasTitulo(tituloId: string): Promise<BaixaTituloRow[]> {
   const { data, error } = await withDeadline(
     (supabase as any)
@@ -103,12 +396,37 @@ export async function listarBaixasTitulo(tituloId: string): Promise<BaixaTituloR
   );
 
   if (error) throw new Error(error.message);
-  return (data ?? []) as BaixaTituloRow[];
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    valor_principal: numeric(row.valor_principal),
+    valor_desconto: numeric(row.valor_desconto),
+    valor_juros: numeric(row.valor_juros),
+    valor_multa: numeric(row.valor_multa),
+    valor_acrescimos: numeric(row.valor_acrescimos),
+    valor_retencoes: numeric(row.valor_retencoes),
+  })) as BaixaTituloRow[];
+}
+
+/** Timeline imutável de auditoria do título, mais recente primeiro. */
+export async function listarEventosTitulo(tituloId: string): Promise<EventoTituloRow[]> {
+  const { data, error } = await withDeadline(
+    (supabase as any)
+      .from("financeiro_titulo_eventos")
+      .select(
+        "id,titulo_id,baixa_id,entidade,entidade_id,evento,ator_id,ator_login,origem,dados_antes,dados_depois,metadata,criado_em",
+      )
+      .eq("titulo_id", tituloId)
+      .order("criado_em", { ascending: false }),
+    15_000,
+    "financeiro.listarEventosTitulo",
+  );
+  if (error) throw new Error(error.message);
+  return (data ?? []) as EventoTituloRow[];
 }
 
 /**
- * Read model operacional do Financeiro. Mantém o legado intacto e aplica
- * saldo/status do ledger somente às linhas do núcleo canônico.
+ * Read model operacional consolidado. Mantido para consumidores analíticos que
+ * precisam enxergar legado + canônico no mesmo conjunto.
  */
 export async function listarFinanceiroOperacionalPaged(
   cols: string,

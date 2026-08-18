@@ -1,6 +1,6 @@
 /** @module-kind io */
 /**
- * withDeadline — SEC-006. Envelopa uma Promise arbitrária com um
+ * withDeadline — SEC-006. Envelopa uma Promise/thenable arbitrária com um
  * deadline explícito. Se `ms` estourar antes da resolução, rejeita com
  * `DeadlineExceededError` e o log estruturado registra o evento.
  *
@@ -10,9 +10,9 @@
  * ```
  *
  * Diferente de `fetchWithRetry`, é agnóstico ao transporte — serve para
- * chamadas Supabase, RPCs, promises de bibliotecas de terceiros, etc.
- * Não cancela a operação subjacente (JS não permite abortar Promise
- * pura); apenas garante que o chamador não fique bloqueado.
+ * chamadas Supabase/PostgREST, RPCs, promises de bibliotecas de terceiros,
+ * etc. Não cancela a operação subjacente; apenas garante que o chamador não
+ * fique bloqueado.
  */
 import { logger } from "@/lib/core/logger";
 
@@ -39,21 +39,23 @@ export interface DeadlineOptions {
 }
 
 /**
- * Rejeita a promise se `ms` estourar antes da conclusão. Sempre limpa o
- * timer (não vaza handle mesmo em caminho de sucesso).
+ * Rejeita a operação se `ms` estourar antes da conclusão. Aceita PromiseLike
+ * para preservar corretamente o tipo dos builders thenable do Supabase.
+ * Sempre limpa o timer (não vaza handle mesmo em caminho de sucesso).
  */
-export function withDeadline<T>(
-  promise: Promise<T>,
+export function withDeadline<TPromise extends PromiseLike<unknown>>(
+  promise: TPromise,
   ms: number,
   labelOrOpts: string | DeadlineOptions = "operation",
-): Promise<T> {
+): Promise<Awaited<TPromise>> {
   const opts: DeadlineOptions =
     typeof labelOrOpts === "string" ? { label: labelOrOpts } : labelOrOpts;
   const label = opts.label ?? "operation";
+  const normalized = Promise.resolve(promise);
 
-  if (!Number.isFinite(ms) || ms <= 0) return promise;
+  if (!Number.isFinite(ms) || ms <= 0) return normalized;
 
-  return new Promise<T>((resolve, reject) => {
+  return new Promise<Awaited<TPromise>>((resolve, reject) => {
     let settled = false;
     const timer = setTimeout(() => {
       if (settled) return;
@@ -68,7 +70,7 @@ export function withDeadline<T>(
       reject(err);
     }, ms);
 
-    promise.then(
+    normalized.then(
       (value) => {
         if (settled) return;
         settled = true;
