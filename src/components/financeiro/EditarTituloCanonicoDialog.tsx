@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { FinanceiroSearchCombobox } from "@/components/financeiro/FinanceiroSearchCombobox";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,10 +24,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { brl } from "@/lib/billing";
 import { financeiroRepo, planoContasRepo } from "@/lib/repositories/financeiro";
-import {
-  editarTituloCanonico,
-  type EditarTituloCanonicoInput,
-} from "@/lib/repositories/financeiro-titulos-operacoes";
+import { editarTituloManualCanonicoV3 } from "@/lib/repositories/financeiro-titulos-manual";
 import type {
   RateioTituloRow,
   TituloCanonicoResumo,
@@ -59,6 +57,8 @@ export function EditarTituloCanonicoDialog({
   onSuccess,
 }: EditarTituloCanonicoDialogProps) {
   const [naturezaTipo, setNaturezaTipo] = useState<"1" | "2">(titulo.tipo === "receber" ? "1" : "2");
+  const [tipoDocumento, setTipoDocumento] = useState(titulo.tipo_documento ?? "");
+  const [documento, setDocumento] = useState(titulo.numero_documento ?? "");
   const [nome, setNome] = useState(titulo.nome ?? "");
   const [cnpjCpf, setCnpjCpf] = useState(titulo.cnpj_cpf ?? "");
   const [dataEmissao, setDataEmissao] = useState(titulo.data_emissao ?? "");
@@ -69,6 +69,8 @@ export function EditarTituloCanonicoDialog({
   useEffect(() => {
     if (!open) return;
     setNaturezaTipo(titulo.tipo === "receber" ? "1" : "2");
+    setTipoDocumento(titulo.tipo_documento ?? "");
+    setDocumento(titulo.numero_documento ?? "");
     setNome(titulo.nome ?? "");
     setCnpjCpf(titulo.cnpj_cpf ?? "");
     setDataEmissao(titulo.data_emissao ?? "");
@@ -100,6 +102,22 @@ export function EditarTituloCanonicoDialog({
     () => (naturezas ?? []).filter((natureza: any) => natureza.ativo !== false),
     [naturezas],
   );
+  const naturezaOptions = useMemo(
+    () =>
+      naturezasAtivas.map((natureza: any) => ({
+        value: String(natureza.cod_natureza),
+        label: `${natureza.cod_natureza} — ${natureza.descricao ?? "Sem descrição"}`,
+      })),
+    [naturezasAtivas],
+  );
+  const centroOptions = useMemo(
+    () =>
+      (centros ?? []).map((centro) => ({
+        value: centro.codigo,
+        label: `${centro.codigo} — ${centro.nome ?? centro.codigo}`,
+      })),
+    [centros],
+  );
 
   const total = useMemo(
     () => rateios.reduce((acc, item) => acc + (Number(item.valor_rateio.replace(",", ".")) || 0), 0),
@@ -108,9 +126,11 @@ export function EditarTituloCanonicoDialog({
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const payload: EditarTituloCanonicoInput = {
+      await editarTituloManualCanonicoV3({
         titulo_id: titulo.id,
         natureza_tipo: Number(naturezaTipo) as 1 | 2,
+        tipo_documento: tipoDocumento.trim(),
+        numero_documento: documento.trim(),
         cnpj_cpf: cnpjCpf.trim() || null,
         nome: nome.trim() || null,
         data_emissao: dataEmissao || null,
@@ -121,8 +141,7 @@ export function EditarTituloCanonicoDialog({
           centro_custo: item.centro_custo,
           valor_rateio: Number(item.valor_rateio.replace(",", ".")) || 0,
         })),
-      };
-      await editarTituloCanonico(payload);
+      });
     },
     onSuccess: async () => {
       toast.success("Título atualizado.");
@@ -133,6 +152,8 @@ export function EditarTituloCanonicoDialog({
   });
 
   const podeSalvar =
+    Boolean(tipoDocumento.trim()) &&
+    Boolean(documento.trim()) &&
     Boolean(dataVencimento) &&
     total > 0 &&
     rateios.every(
@@ -167,6 +188,25 @@ export function EditarTituloCanonicoDialog({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
+              <Label>Tipo de Documento</Label>
+              <Input
+                value={tipoDocumento}
+                onChange={(event) => setTipoDocumento(event.target.value)}
+                placeholder="Ex.: 04, 39, NF, BOL"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Documento</Label>
+              <Input
+                value={documento}
+                onChange={(event) => setDocumento(event.target.value)}
+                placeholder="Número do documento"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
               <Label>Contraparte</Label>
               <Input value={nome} onChange={(event) => setNome(event.target.value)} />
             </div>
@@ -196,7 +236,9 @@ export function EditarTituloCanonicoDialog({
             <div className="flex items-center justify-between gap-2">
               <div>
                 <Label>Rateio</Label>
-                <p className="text-xs text-muted-foreground">Natureza e centro de custo por linha; a obra continua derivada pelo centro de custo.</p>
+                <p className="text-xs text-muted-foreground">
+                  Pesquise Natureza e Centro de Custo por código ou descrição; a obra continua derivada pelo centro de custo.
+                </p>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={() => setRateios((atual) => [...atual, novaLinha()])}>
                 <Plus className="mr-1 h-3.5 w-3.5" /> Linha
@@ -206,27 +248,25 @@ export function EditarTituloCanonicoDialog({
             <div className="space-y-2">
               {rateios.map((item) => (
                 <div key={item.id} className="grid grid-cols-1 items-center gap-2 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem]">
-                  <Select value={item.cod_natureza} onValueChange={(value) => atualizarLinha(item.id, { cod_natureza: value })}>
-                    <SelectTrigger><SelectValue placeholder="Natureza" /></SelectTrigger>
-                    <SelectContent>
-                      {naturezasAtivas.map((natureza: any) => (
-                        <SelectItem key={natureza.cod_natureza} value={natureza.cod_natureza}>
-                          {natureza.cod_natureza} — {natureza.descricao}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FinanceiroSearchCombobox
+                    value={item.cod_natureza}
+                    onValueChange={(value) => atualizarLinha(item.id, { cod_natureza: value })}
+                    options={naturezaOptions}
+                    placeholder="Natureza"
+                    searchPlaceholder="Pesquisar natureza…"
+                    emptyText="Nenhuma natureza encontrada."
+                    ariaLabel="Natureza do rateio"
+                  />
 
-                  <Select value={item.centro_custo} onValueChange={(value) => atualizarLinha(item.id, { centro_custo: value })}>
-                    <SelectTrigger><SelectValue placeholder="Centro de custo" /></SelectTrigger>
-                    <SelectContent>
-                      {(centros ?? []).map((centro) => (
-                        <SelectItem key={centro.codigo} value={centro.codigo}>
-                          {centro.codigo} — {centro.nome ?? centro.codigo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FinanceiroSearchCombobox
+                    value={item.centro_custo}
+                    onValueChange={(value) => atualizarLinha(item.id, { centro_custo: value })}
+                    options={centroOptions}
+                    placeholder="Centro de custo"
+                    searchPlaceholder="Pesquisar centro de custo…"
+                    emptyText="Nenhum centro de custo encontrado."
+                    ariaLabel="Centro de custo do rateio"
+                  />
 
                   <Input
                     inputMode="decimal"
