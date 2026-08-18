@@ -101,7 +101,9 @@ function FinLancamentos() {
               </p>
             </div>
             <Suspense fallback={<div className="py-8 text-sm text-muted-foreground">Carregando importador…</div>}>
-              <FinImportar />
+              <div className="[&>div]:!p-0 [&>div]:!space-y-4 [&>div>header]:hidden">
+                <FinImportar />
+              </div>
             </Suspense>
           </TabsContent>
         )}
