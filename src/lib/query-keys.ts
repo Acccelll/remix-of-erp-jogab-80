@@ -206,6 +206,8 @@ export const registeredQueryKeyRoots = [
   "ncs",
   "nfs",
   "nfs_ro",
+  "nota_fiscal_entrada_itens",
+  "notas_fiscais_entrada",
   "notificacoes",
   "obra",
   "obra-contrato-info",

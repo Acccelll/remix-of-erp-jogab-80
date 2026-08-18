@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, PackageCheck, Loader2 } from "lucide-react";
+import NotaFiscalEntradaDialog from "@/components/suprimentos/NotaFiscalEntradaDialog";
 import { OnboardingHint } from "@/components/onboarding/OnboardingHint";
 import { useObras } from "@/hooks/obras/useObras";
 import { useObrasEditaveis } from "@/hooks/obras/useObrasEditaveis";
@@ -268,6 +269,14 @@ export default function Recebimento() {
                     </div>
                     {r.observacao && <div className="text-sm mt-1">{r.observacao}</div>}
                   </div>
+                  {oc?.fornecedor_id && (
+                    <NotaFiscalEntradaDialog
+                      ordemCompraId={r.ordem_compra_id}
+                      recebimentoId={r.id}
+                      fornecedorId={oc.fornecedor_id}
+                      onDone={load}
+                    />
+                  )}
                 </div>
               </div>
             );

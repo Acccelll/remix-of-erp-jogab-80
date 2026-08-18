@@ -18,6 +18,7 @@ export type FornecedorHistoricoRow = {
   preco_medio_vencedor: number | null;
   prazo_medio_prometido_dias: number | null;
   prazo_medio_real_dias: number | null;
+  total_notas_fiscais_entrada: number;
 };
 
 function unwrap<T>(res: { data: T | null; error: unknown }): T {
