@@ -17,8 +17,8 @@ import { round2 } from "@/lib/core/money";
 
 export interface FinLinha {
   lancamento_id: string | null;
-  /** UUID do título no núcleo canônico; null para linhas puramente legadas/TOTVS. */
-  titulo_id: string | null;
+  /** UUID do título no núcleo canônico; ausente/null para linhas puramente legadas/TOTVS. */
+  titulo_id?: string | null;
   obra_id: string | null;
   obra_nome: string | null;
   obra_codigo: string | null;
@@ -32,12 +32,12 @@ export interface FinLinha {
   valor_liquido: number | null;
   valor_baixado: number | null;
   valor_rateio: number | null;
-  /** Totais do título canônico inteiro; null no legado. */
-  titulo_valor_liquido: number | null;
-  titulo_valor_baixado: number | null;
-  titulo_saldo_aberto: number | null;
-  titulo_valor_movimentado: number | null;
-  qtd_baixas: number | null;
+  /** Totais do título canônico inteiro; ausentes/null no legado. */
+  titulo_valor_liquido?: number | null;
+  titulo_valor_baixado?: number | null;
+  titulo_saldo_aberto?: number | null;
+  titulo_valor_movimentado?: number | null;
+  qtd_baixas?: number | null;
   mes_competencia: string | null;
   data_vencimento: string | null;
   data_pagamento: string | null;
@@ -48,9 +48,9 @@ export interface FinLinha {
   ref_lancamento: number | null;
   centro_custo: string | null;
   desc_centro_custo: string | null;
-  centro_custo_tipo: string | null; // 'obra' | 'indireto' | 'nao_classificado'
+  centro_custo_tipo: string | null;
   categoria_indireta: string | null;
-  origem: string | null; // 'totvs' | 'sistema' | 'manual'
+  origem: string | null;
 }
 
 export interface KpisObra {
