@@ -1,13 +1,11 @@
 /** @module-kind pure */
-// Agregações puras sobre linhas da view `vw_financeiro_obra`.
+// Agregações puras sobre linhas da view operacional financeira.
 //
 // IMPORTANTE — Dupla contagem:
 //   A view repete o título (lancamento_id) por natureza de rateio. Portanto:
-//   - KPIs por título (receita/despesa, baixado, a receber/pagar, vencido) devem
-//     ser somados a partir de linhas DEDUPLICADAS por `lancamento_id`, usando
-//     `valor_liquido` / `valor_baixado` do próprio título.
-//   - Análises por natureza usam `valor_rateio` diretamente (já é a parcela
-//     correta do título naquela conta), sem deduplicar.
+//   - KPIs por título/fatia usam linhas DEDUPLICADAS por `lancamento_id`;
+//   - Análises por natureza usam `valor_rateio` diretamente;
+//   - `titulo_id` identifica o título canônico inteiro quando a origem é ERP.
 //
 // Convenções:
 //   - natureza_tipo: 1 = receita, 2 = despesa
@@ -19,6 +17,8 @@ import { round2 } from "@/lib/core/money";
 
 export interface FinLinha {
   lancamento_id: string | null;
+  /** UUID do título no núcleo canônico; null para linhas puramente legadas/TOTVS. */
+  titulo_id: string | null;
   obra_id: string | null;
   obra_nome: string | null;
   obra_codigo: string | null;
@@ -32,6 +32,12 @@ export interface FinLinha {
   valor_liquido: number | null;
   valor_baixado: number | null;
   valor_rateio: number | null;
+  /** Totais do título canônico inteiro; null no legado. */
+  titulo_valor_liquido: number | null;
+  titulo_valor_baixado: number | null;
+  titulo_saldo_aberto: number | null;
+  titulo_valor_movimentado: number | null;
+  qtd_baixas: number | null;
   mes_competencia: string | null;
   data_vencimento: string | null;
   data_pagamento: string | null;
@@ -70,11 +76,9 @@ import {
   STATUS_A_VENCER,
 } from "./status-bucket";
 
-// Status vem do módulo central `./status-bucket`. Não redeclarar constantes aqui.
-
 const n = (v: number | null | undefined) => Number(v ?? 0) || 0;
 
-/** Deduplica linhas por lancamento_id (1 linha por título). */
+/** Deduplica linhas por lancamento_id (1 linha por fatia financeira). */
 function porTitulo(linhas: FinLinha[]): FinLinha[] {
   const seen = new Map<string, FinLinha>();
   for (const l of linhas) {
@@ -85,7 +89,6 @@ function porTitulo(linhas: FinLinha[]): FinLinha[] {
 }
 
 export function kpisObra(linhas: FinLinha[]): KpisObra {
-  // Movimentações financeiras (grupo "3") são separadas — usar linhas únicas por título também.
   const movRaw = linhas.filter((l) => l.grupo === "3");
   const obraRaw = linhas.filter((l) => l.grupo !== "3");
   const obraTitulos = porTitulo(obraRaw);
@@ -191,7 +194,6 @@ export function porNatureza(linhas: FinLinha[]): GrupoNode[] {
     const s = l.subgrupo ?? "?";
     const c = l.cod_natureza ?? "?";
     const v = n(l.valor_rateio);
-    // proporção pago/aberto a partir do título
     const liq = n(l.valor_liquido);
     const bx = n(l.valor_baixado);
     const ratio = liq > 0 ? bx / liq : l.status_cod === STATUS_BAIXADO ? 1 : 0;
