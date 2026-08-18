@@ -3,9 +3,24 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { REPO_LIMITS } from "./_limits";
 
-export type FornecedorRow = Database["public"]["Tables"]["fornecedores"]["Row"];
-export type FornecedorInsert = Database["public"]["Tables"]["fornecedores"]["Insert"];
-export type FornecedorUpdate = Database["public"]["Tables"]["fornecedores"]["Update"];
+// Dados bancários do favorecido (Fase 5 — CNAB) e prazo_pagamento_dias
+// (Fase 4) são colunas novas ainda não refletidas em types.ts — estendidas
+// manualmente até a próxima regeneração.
+type FornecedorBancario = {
+  prazo_pagamento_dias: number | null;
+  banco_codigo: string | null;
+  agencia: string | null;
+  agencia_dv: string | null;
+  conta: string | null;
+  conta_dv: string | null;
+  tipo_conta: string | null;
+  chave_pix: string | null;
+};
+export type FornecedorRow = Database["public"]["Tables"]["fornecedores"]["Row"] & FornecedorBancario;
+export type FornecedorInsert = Database["public"]["Tables"]["fornecedores"]["Insert"] &
+  Partial<FornecedorBancario>;
+export type FornecedorUpdate = Database["public"]["Tables"]["fornecedores"]["Update"] &
+  Partial<FornecedorBancario>;
 
 // vw_fornecedor_historico ainda não está em types.ts (view nova, tipos não
 // regenerados neste ciclo) — tipado manualmente aqui, único ponto de contato.
@@ -18,6 +33,7 @@ export type FornecedorHistoricoRow = {
   preco_medio_vencedor: number | null;
   prazo_medio_prometido_dias: number | null;
   prazo_medio_real_dias: number | null;
+  total_notas_fiscais_entrada: number;
 };
 
 function unwrap<T>(res: { data: T | null; error: unknown }): T {
@@ -34,7 +50,7 @@ function unwrap<T>(res: { data: T | null; error: unknown }): T {
  */
 export const fornecedoresRepo = {
   async listCompleto(
-    cols: string = "id, cnpj, razao_social, nome_fantasia, contato, email, telefone, categorias, ativo, created_at, updated_at",
+    cols: string = "id, cnpj, razao_social, nome_fantasia, contato, email, telefone, categorias, ativo, created_at, updated_at, banco_codigo, agencia, agencia_dv, conta, conta_dv, tipo_conta, chave_pix",
   ): Promise<FornecedorRow[]> {
     return (
       (unwrap(

@@ -60,6 +60,7 @@ const FinClientes = lazy(() => import("@/pages/financeiro/FinClientes"));
 const FinImportar = lazy(() => import("@/pages/financeiro/FinImportar"));
 const FinDividas = lazy(() => import("@/pages/financeiro/FinDividas"));
 const PrevisaoPagamento = lazy(() => import("@/pages/financeiro/PrevisaoPagamento"));
+const Cnab = lazy(() => import("@/pages/financeiro/Cnab"));
 const FinNaturezas = lazy(() => import("@/pages/financeiro/FinNaturezas"));
 const FinFaturamento = lazy(() => import("@/pages/financeiro/FinFaturamento"));
 const FinAntecipacao = lazy(() => import("@/pages/financeiro/FinAntecipacao"));
@@ -205,6 +206,7 @@ const ProtectedRoutes = () => {
           <Route path="/financeiro/importar" element={<FinImportar />} />
           <Route path="/financeiro/dividas" element={<FinDividas />} />
           <Route path="/financeiro/previsao-pagamento" element={<PrevisaoPagamento />} />
+          <Route path="/financeiro/cnab" element={<Cnab />} />
           <Route path="/financeiro/naturezas" element={<FinNaturezas />} />
           <Route path="/financeiro/faturamento" element={<FinFaturamento />} />
           <Route path="/financeiro/antecipacao" element={<FinAntecipacao />} />

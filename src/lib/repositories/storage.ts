@@ -49,5 +49,7 @@ export const cardAnexosStorage = bucket("card-anexos");
 export const nfsStorage = bucket("nfs");
 /** AFD da fiscalização: bucket privado, policies restritas a GM. */
 export const pontoAfdStorage = bucket("ponto-afd");
+/** Remessas/retornos CNAB: bucket privado, policies restritas a Financeiro/GM. */
+export const cnabStorage = bucket("cnab");
 
 export const storageRepo = { bucket };
