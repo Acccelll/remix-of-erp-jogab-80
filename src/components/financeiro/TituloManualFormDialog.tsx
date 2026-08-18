@@ -23,11 +23,17 @@ import {
 } from "@/components/ui/select";
 
 import { financeiroRepo, planoContasRepo } from "@/lib/repositories/financeiro";
+import { criarTituloManualCanonico } from "@/lib/repositories/financeiro-titulos";
 import { brl } from "@/lib/billing";
 import { finKeys } from "@/lib/financeiro-totvs/queries";
 import type { RateioManualInput, TituloManualInput } from "@/lib/financeiro-totvs/types";
 
-type RateioLinha = { id: string; cod_natureza: string; valor_rateio: string };
+type RateioLinha = {
+  id: string;
+  cod_natureza: string;
+  centro_custo: string;
+  valor_rateio: string;
+};
 
 export type TituloManualEdicao = TituloManualInput & { ref_lancamento: number };
 
@@ -39,7 +45,12 @@ interface TituloManualFormDialogProps {
 }
 
 function novaLinhaVazia(): RateioLinha {
-  return { id: crypto.randomUUID(), cod_natureza: "", valor_rateio: "" };
+  return {
+    id: crypto.randomUUID(),
+    cod_natureza: "",
+    centro_custo: "",
+    valor_rateio: "",
+  };
 }
 
 export function TituloManualFormDialog({
@@ -51,7 +62,6 @@ export function TituloManualFormDialog({
   const isEdicao = !!edicao;
 
   const [naturezaTipo, setNaturezaTipo] = useState<"1" | "2">("2");
-  const [centroCusto, setCentroCusto] = useState("");
   const [nome, setNome] = useState("");
   const [cnpjCpf, setCnpjCpf] = useState("");
   const [dataEmissao, setDataEmissao] = useState("");
@@ -63,7 +73,6 @@ export function TituloManualFormDialog({
     if (!open) return;
     if (edicao) {
       setNaturezaTipo(String(edicao.natureza_tipo) as "1" | "2");
-      setCentroCusto(edicao.centro_custo);
       setNome(edicao.nome ?? "");
       setCnpjCpf(edicao.cnpj_cpf ?? "");
       setDataEmissao(edicao.data_emissao ?? "");
@@ -74,13 +83,13 @@ export function TituloManualFormDialog({
           ? edicao.rateios.map((r) => ({
               id: crypto.randomUUID(),
               cod_natureza: r.cod_natureza,
+              centro_custo: r.centro_custo || edicao.centro_custo || "",
               valor_rateio: String(r.valor_rateio),
             }))
           : [novaLinhaVazia()],
       );
     } else {
       setNaturezaTipo("2");
-      setCentroCusto("");
       setNome("");
       setCnpjCpf("");
       setDataEmissao("");
@@ -124,11 +133,11 @@ export function TituloManualFormDialog({
     mutationFn: async () => {
       const rateiosPayload: RateioManualInput[] = rateios.map((r) => ({
         cod_natureza: r.cod_natureza,
+        centro_custo: r.centro_custo,
         valor_rateio: Number(r.valor_rateio.replace(",", ".")) || 0,
       }));
-      const input = {
-        natureza_tipo: Number(naturezaTipo),
-        centro_custo: centroCusto,
+      const input: TituloManualInput = {
+        natureza_tipo: Number(naturezaTipo) as 1 | 2,
         cnpj_cpf: cnpjCpf.trim() || null,
         nome: nome.trim() || null,
         data_emissao: dataEmissao || null,
@@ -136,10 +145,20 @@ export function TituloManualFormDialog({
         historico: historico.trim() || null,
         rateios: rateiosPayload,
       };
+
       if (isEdicao) {
-        await financeiroRepo.rpcEditarTituloManual(edicao!.ref_lancamento, input);
+        const centrosUnicos = new Set(rateiosPayload.map((r) => r.centro_custo));
+        if (centrosUnicos.size !== 1) {
+          throw new Error(
+            "Edição de título com múltiplos centros de custo será habilitada na Etapa 6 — Operações.",
+          );
+        }
+        await financeiroRepo.rpcEditarTituloManual(edicao!.ref_lancamento, {
+          ...input,
+          centro_custo: rateiosPayload[0].centro_custo ?? "",
+        });
       } else {
-        await financeiroRepo.rpcCriarTituloManual(input);
+        await criarTituloManualCanonico(input);
       }
     },
     onSuccess: () => {
@@ -153,47 +172,34 @@ export function TituloManualFormDialog({
   });
 
   const podeSalvar =
-    !!centroCusto &&
     !!dataVencimento &&
-    rateios.every((r) => r.cod_natureza && Number(r.valor_rateio.replace(",", ".")) > 0) &&
+    rateios.every(
+      (r) =>
+        r.cod_natureza &&
+        r.centro_custo &&
+        Number(r.valor_rateio.replace(",", ".")) > 0,
+    ) &&
     totalRateio > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdicao ? "Editar título" : "Novo título"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label>Tipo</Label>
-              <Select value={naturezaTipo} onValueChange={(v) => setNaturezaTipo(v as "1" | "2")}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">A receber</SelectItem>
-                  <SelectItem value="2">A pagar</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Centro de custo</Label>
-              <Select value={centroCusto} onValueChange={setCentroCusto}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(centros ?? []).map((c) => (
-                    <SelectItem key={c.codigo} value={c.codigo}>
-                      {c.codigo} — {c.nome ?? c.codigo}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="max-w-xs space-y-1.5">
+            <Label>Tipo</Label>
+            <Select value={naturezaTipo} onValueChange={(v) => setNaturezaTipo(v as "1" | "2")}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">A receber</SelectItem>
+                <SelectItem value="2">A pagar</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -237,19 +243,35 @@ export function TituloManualFormDialog({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label>Rateio por natureza</Label>
+              <div>
+                <Label>Rateio</Label>
+                <p className="text-xs text-muted-foreground">
+                  Cada linha classifica o valor por natureza e centro de custo; a obra é vinculada automaticamente pelo centro de custo.
+                </p>
+              </div>
               <Button type="button" variant="outline" size="sm" onClick={addLinha}>
                 <Plus className="h-3.5 w-3.5 mr-1" /> Linha
               </Button>
             </div>
+
+            <div className="hidden md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem] gap-2 px-1 text-xs text-muted-foreground">
+              <span>Natureza</span>
+              <span>Centro de custo</span>
+              <span>Valor</span>
+              <span />
+            </div>
+
             <div className="space-y-2">
               {rateios.map((r) => (
-                <div key={r.id} className="flex items-center gap-2">
+                <div
+                  key={r.id}
+                  className="grid grid-cols-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem] items-center gap-2"
+                >
                   <Select
                     value={r.cod_natureza}
                     onValueChange={(v) => updateLinha(r.id, { cod_natureza: v })}
                   >
-                    <SelectTrigger className="flex-1">
+                    <SelectTrigger>
                       <SelectValue placeholder="Natureza" />
                     </SelectTrigger>
                     <SelectContent>
@@ -260,19 +282,37 @@ export function TituloManualFormDialog({
                       ))}
                     </SelectContent>
                   </Select>
+
+                  <Select
+                    value={r.centro_custo}
+                    onValueChange={(v) => updateLinha(r.id, { centro_custo: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Centro de custo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(centros ?? []).map((c) => (
+                        <SelectItem key={c.codigo} value={c.codigo}>
+                          {c.codigo} — {c.nome ?? c.codigo}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                   <Input
-                    className="w-32"
                     inputMode="decimal"
                     placeholder="Valor"
                     value={r.valor_rateio}
                     onChange={(e) => updateLinha(r.id, { valor_rateio: e.target.value })}
                   />
+
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     onClick={() => removeLinha(r.id)}
                     disabled={rateios.length === 1}
+                    aria-label="Remover linha de rateio"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
