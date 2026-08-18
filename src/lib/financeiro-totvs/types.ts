@@ -78,16 +78,18 @@ export const STATUS_TOTVS_LEGENDA: Record<number, string> = {
   56: "A Vencer",
 };
 
-/** Uma linha de rateio por natureza dentro de um título lançado manualmente. */
+/** Linha operacional de rateio Natureza × Centro de Custo × Obra. */
 export interface RateioManualInput {
   cod_natureza: string;
+  centro_custo: string;
   valor_rateio: number;
 }
 
-/** Payload para `fn_criar_titulo_manual` / `fn_editar_titulo_manual`. */
+/** Payload do cadastro manual de título. */
 export interface TituloManualInput {
   natureza_tipo: NaturezaTipo;
-  centro_custo: string;
+  /** Mantido temporariamente para compatibilidade com a edição legada da Etapa 6. */
+  centro_custo?: string;
   cnpj_cpf: string | null;
   nome: string | null;
   data_emissao: string | null;
