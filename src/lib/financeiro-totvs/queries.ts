@@ -1,9 +1,10 @@
 /** @module-kind io */
 // Queries centralizadas do módulo Financeiro TOTVS/ERP.
-// ARC-003 — acesso a dados delegado a `financeiroTotvsRepo`.
+// ARC-003 — acesso a dados delegado aos repositories.
 
 import { queryKey } from "@/lib/query-keys";
 import { financeiroTotvsRepo } from "@/lib/repositories/financeiro";
+import { listarFinanceiroOperacionalPaged } from "@/lib/repositories/financeiro-titulos";
 import { withDeadline } from "@/lib/core/http/withDeadline";
 import type { FinLinha } from "./agregacoes";
 import type { RollupLinha } from "./evolucao";
@@ -20,7 +21,6 @@ export const finKeys = {
   evolucao: (filtros: { obraId?: string | null } = {}) => queryKey("fin_evolucao", filtros),
 };
 
-// Colunas exatas usadas por FinLinha — evita puxar campos não consumidos.
 const FIN_LINHA_COLS = [
   "lancamento_id",
   "titulo_id",
@@ -59,9 +59,9 @@ const FIN_LINHA_COLS = [
 
 async function fetchAllFinanceiroRows(obraId?: string): Promise<FinLinha[]> {
   return (await withDeadline(
-    financeiroTotvsRepo.listVwFinanceiroObraPaged(FIN_LINHA_COLS, obraId),
+    listarFinanceiroOperacionalPaged(FIN_LINHA_COLS, obraId),
     READ_DEADLINE_MS,
-    obraId ? `fin.listVwFinanceiroObraPaged.${obraId}` : "fin.listVwFinanceiroObraPaged.all",
+    obraId ? `fin.listarFinanceiroOperacionalPaged.${obraId}` : "fin.listarFinanceiroOperacionalPaged.all",
   )) as FinLinha[];
 }
 
