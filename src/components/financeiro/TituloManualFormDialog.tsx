@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 
+import { FinanceiroSearchCombobox } from "@/components/financeiro/FinanceiroSearchCombobox";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,7 @@ import {
 } from "@/components/ui/select";
 
 import { financeiroRepo, planoContasRepo } from "@/lib/repositories/financeiro";
-import { criarTituloManualCanonico } from "@/lib/repositories/financeiro-titulos";
+import { criarTituloManualCanonicoV3 } from "@/lib/repositories/financeiro-titulos-manual";
 import { brl } from "@/lib/billing";
 import { finKeys } from "@/lib/financeiro-totvs/queries";
 import type { RateioManualInput, TituloManualInput } from "@/lib/financeiro-totvs/types";
@@ -40,7 +41,7 @@ export type TituloManualEdicao = TituloManualInput & { ref_lancamento: number };
 interface TituloManualFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Presente quando o dialog está editando um título já existente. */
+  /** Presente quando o dialog está editando um título legado já existente. */
   edicao?: TituloManualEdicao | null;
 }
 
@@ -62,6 +63,8 @@ export function TituloManualFormDialog({
   const isEdicao = !!edicao;
 
   const [naturezaTipo, setNaturezaTipo] = useState<"1" | "2">("2");
+  const [tipoDocumento, setTipoDocumento] = useState("");
+  const [documento, setDocumento] = useState("");
   const [nome, setNome] = useState("");
   const [cnpjCpf, setCnpjCpf] = useState("");
   const [dataEmissao, setDataEmissao] = useState("");
@@ -73,6 +76,8 @@ export function TituloManualFormDialog({
     if (!open) return;
     if (edicao) {
       setNaturezaTipo(String(edicao.natureza_tipo) as "1" | "2");
+      setTipoDocumento("");
+      setDocumento("");
       setNome(edicao.nome ?? "");
       setCnpjCpf(edicao.cnpj_cpf ?? "");
       setDataEmissao(edicao.data_emissao ?? "");
@@ -90,6 +95,8 @@ export function TituloManualFormDialog({
       );
     } else {
       setNaturezaTipo("2");
+      setTipoDocumento("");
+      setDocumento("");
       setNome("");
       setCnpjCpf("");
       setDataEmissao("");
@@ -112,6 +119,22 @@ export function TituloManualFormDialog({
   const naturezasAtivas = useMemo(
     () => (naturezas ?? []).filter((n: any) => n.ativo !== false),
     [naturezas],
+  );
+  const naturezaOptions = useMemo(
+    () =>
+      naturezasAtivas.map((n: any) => ({
+        value: String(n.cod_natureza),
+        label: `${n.cod_natureza} — ${n.descricao ?? "Sem descrição"}`,
+      })),
+    [naturezasAtivas],
+  );
+  const centroOptions = useMemo(
+    () =>
+      (centros ?? []).map((c) => ({
+        value: c.codigo,
+        label: `${c.codigo} — ${c.nome ?? c.codigo}`,
+      })),
+    [centros],
   );
 
   const totalRateio = useMemo(
@@ -150,7 +173,7 @@ export function TituloManualFormDialog({
         const centrosUnicos = new Set(rateiosPayload.map((r) => r.centro_custo));
         if (centrosUnicos.size !== 1) {
           throw new Error(
-            "Edição de título com múltiplos centros de custo será habilitada na Etapa 6 — Operações.",
+            "Edição legada de título com múltiplos centros de custo não é suportada por este fluxo.",
           );
         }
         await financeiroRepo.rpcEditarTituloManual(edicao!.ref_lancamento, {
@@ -158,7 +181,11 @@ export function TituloManualFormDialog({
           centro_custo: rateiosPayload[0].centro_custo ?? "",
         });
       } else {
-        await criarTituloManualCanonico(input);
+        await criarTituloManualCanonicoV3({
+          ...input,
+          tipo_documento: tipoDocumento.trim(),
+          numero_documento: documento.trim(),
+        });
       }
     },
     onSuccess: () => {
@@ -171,7 +198,9 @@ export function TituloManualFormDialog({
     },
   });
 
+  const identificacaoOk = isEdicao || (tipoDocumento.trim().length > 0 && documento.trim().length > 0);
   const podeSalvar =
+    identificacaoOk &&
     !!dataVencimento &&
     rateios.every(
       (r) =>
@@ -183,7 +212,7 @@ export function TituloManualFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdicao ? "Editar título" : "Novo título"}</DialogTitle>
         </DialogHeader>
@@ -202,7 +231,28 @@ export function TituloManualFormDialog({
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {!isEdicao && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Tipo de Documento</Label>
+                <Input
+                  value={tipoDocumento}
+                  onChange={(e) => setTipoDocumento(e.target.value)}
+                  placeholder="Ex.: 04, 39, NF, BOL"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Documento</Label>
+                <Input
+                  value={documento}
+                  onChange={(e) => setDocumento(e.target.value)}
+                  placeholder="Número do documento"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Contraparte (cliente/fornecedor)</Label>
               <Input value={nome} onChange={(e) => setNome(e.target.value)} />
@@ -213,7 +263,7 @@ export function TituloManualFormDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Data de emissão</Label>
               <Input
@@ -246,15 +296,15 @@ export function TituloManualFormDialog({
               <div>
                 <Label>Rateio</Label>
                 <p className="text-xs text-muted-foreground">
-                  Cada linha classifica o valor por natureza e centro de custo; a obra é vinculada automaticamente pelo centro de custo.
+                  Pesquise por código ou descrição da Natureza e do Centro de Custo. A obra é vinculada automaticamente pelo centro de custo.
                 </p>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={addLinha}>
-                <Plus className="h-3.5 w-3.5 mr-1" /> Linha
+                <Plus className="mr-1 h-3.5 w-3.5" /> Linha
               </Button>
             </div>
 
-            <div className="hidden md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem] gap-2 px-1 text-xs text-muted-foreground">
+            <div className="hidden gap-2 px-1 text-xs text-muted-foreground md:grid md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem]">
               <span>Natureza</span>
               <span>Centro de custo</span>
               <span>Valor</span>
@@ -265,39 +315,27 @@ export function TituloManualFormDialog({
               {rateios.map((r) => (
                 <div
                   key={r.id}
-                  className="grid grid-cols-1 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem] items-center gap-2"
+                  className="grid grid-cols-1 items-center gap-2 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_8rem_2.5rem]"
                 >
-                  <Select
+                  <FinanceiroSearchCombobox
                     value={r.cod_natureza}
-                    onValueChange={(v) => updateLinha(r.id, { cod_natureza: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Natureza" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {naturezasAtivas.map((n: any) => (
-                        <SelectItem key={n.cod_natureza} value={n.cod_natureza}>
-                          {n.cod_natureza} — {n.descricao}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onValueChange={(value) => updateLinha(r.id, { cod_natureza: value })}
+                    options={naturezaOptions}
+                    placeholder="Natureza"
+                    searchPlaceholder="Pesquisar natureza…"
+                    emptyText="Nenhuma natureza encontrada."
+                    ariaLabel="Natureza do rateio"
+                  />
 
-                  <Select
+                  <FinanceiroSearchCombobox
                     value={r.centro_custo}
-                    onValueChange={(v) => updateLinha(r.id, { centro_custo: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Centro de custo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(centros ?? []).map((c) => (
-                        <SelectItem key={c.codigo} value={c.codigo}>
-                          {c.codigo} — {c.nome ?? c.codigo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onValueChange={(value) => updateLinha(r.id, { centro_custo: value })}
+                    options={centroOptions}
+                    placeholder="Centro de custo"
+                    searchPlaceholder="Pesquisar centro de custo…"
+                    emptyText="Nenhum centro de custo encontrado."
+                    ariaLabel="Centro de custo do rateio"
+                  />
 
                   <Input
                     inputMode="decimal"
@@ -333,7 +371,7 @@ export function TituloManualFormDialog({
           >
             {mutation.isPending ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Salvando…
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando…
               </>
             ) : isEdicao ? (
               "Salvar alterações"
