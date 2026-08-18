@@ -2,18 +2,10 @@ import { lazy, Suspense, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Database, Plus, Upload } from "lucide-react";
 
-import { FeatureGate } from "@/components/common/FeatureGate";
 import { TituloManualFormDialog } from "@/components/financeiro/TituloManualFormDialog";
 import { TitulosOperacionaisPanel } from "@/components/financeiro/TitulosOperacionaisPanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePermissions } from "@/contexts/auth/usePermissions";
 import { financeiroTitulosKeys } from "@/lib/repositories/financeiro-titulos";
@@ -23,10 +15,13 @@ const FinLancamentosAnalise = lazy(() => import("@/pages/financeiro/FinLancament
 
 const ROTA = "/financeiro/lancamentos";
 
+type AbaLancamentos = "erp" | "totvs" | "importar";
+
 function FinLancamentos() {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const [novoTituloOpen, setNovoTituloOpen] = useState(false);
+  const [aba, setAba] = useState<AbaLancamentos>("erp");
   const podeCriar = can(ROTA, "I");
   const podeOperar = can(ROTA, "E");
 
@@ -59,35 +54,20 @@ function FinLancamentos() {
             </Button>
           )}
           {podeCriar && (
-            <FeatureGate flag="legacy.financeiro_import">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline">
-                    <Upload className="mr-2 h-4 w-4" /> Importar TOTVS
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-4xl">
-                  <SheetHeader>
-                    <SheetTitle>Importar dados do TOTVS</SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-4">
-                    <Suspense fallback={<div className="py-8 text-sm text-muted-foreground">Carregando importador…</div>}>
-                      <FinImportar />
-                    </Suspense>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </FeatureGate>
+            <Button variant="outline" onClick={() => setAba("importar")}>
+              <Upload className="mr-2 h-4 w-4" /> Importar TOTVS
+            </Button>
           )}
         </div>
       </header>
 
       <TituloManualFormDialog open={novoTituloOpen} onOpenChange={alterarNovoTitulo} />
 
-      <Tabs defaultValue="erp" className="space-y-4">
-        <TabsList className="h-auto">
+      <Tabs value={aba} onValueChange={(value) => setAba(value as AbaLancamentos)} className="space-y-4">
+        <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="erp">Títulos ERP</TabsTrigger>
           <TabsTrigger value="totvs">Análise TOTVS</TabsTrigger>
+          {podeCriar && <TabsTrigger value="importar">Importação TOTVS</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="erp" className="mt-0">
@@ -111,6 +91,20 @@ function FinLancamentos() {
             </div>
           </Suspense>
         </TabsContent>
+
+        {podeCriar && (
+          <TabsContent value="importar" className="mt-0">
+            <div className="mb-4 rounded-lg border bg-muted/25 px-4 py-3">
+              <p className="text-sm font-medium">Importação TOTVS</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Use esta área para atualizar snapshots e dados de referência do TOTVS sem misturá-los aos títulos operacionais do ERP.
+              </p>
+            </div>
+            <Suspense fallback={<div className="py-8 text-sm text-muted-foreground">Carregando importador…</div>}>
+              <FinImportar />
+            </Suspense>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
