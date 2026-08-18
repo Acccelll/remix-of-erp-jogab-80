@@ -105,3 +105,29 @@ export async function listarBaixasTitulo(tituloId: string): Promise<BaixaTituloR
   if (error) throw new Error(error.message);
   return (data ?? []) as BaixaTituloRow[];
 }
+
+/**
+ * Read model operacional do Financeiro. Mantém o legado intacto e aplica
+ * saldo/status do ledger somente às linhas do núcleo canônico.
+ */
+export async function listarFinanceiroOperacionalPaged(
+  cols: string,
+  obraId?: string,
+  pageSize = 1000,
+): Promise<any[]> {
+  const rows: any[] = [];
+  for (let from = 0; ; from += pageSize) {
+    let q = (supabase as any)
+      .from("vw_financeiro_obra_operacional")
+      .select(cols)
+      .order("lancamento_id", { ascending: true })
+      .order("cod_natureza", { ascending: true, nullsFirst: true })
+      .range(from, from + pageSize - 1);
+    if (obraId) q = q.eq("obra_id", obraId);
+    const { data, error } = await q;
+    if (error) throw error;
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) break;
+  }
+  return rows;
+}
