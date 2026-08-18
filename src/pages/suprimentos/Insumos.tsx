@@ -5,6 +5,7 @@ import {
   useCreateInsumo,
   useUpdateInsumo,
   useToggleInsumoAtivo,
+  useInsumosCustoReferencia,
 } from "@/hooks/suprimentos/useInsumos";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,8 @@ type Insumo = {
   codigo: string | null;
   descricao: string;
   tipo: string;
+  categoria: string | null;
+  subcategoria: string | null;
   unidade: string;
   preco_unitario: number;
   fonte: string;
@@ -63,6 +66,14 @@ const Insumos = () => {
   const canEdit = !!currentPlayer?.isGM; // RLS final é no servidor (GM ou setor Engenharia)
   const { data: insumosData = [], isLoading: loading } = useInsumosCompleto();
   const items = insumosData as Insumo[];
+  const { data: custoReferenciaData = [] } = useInsumosCustoReferencia();
+  const custoReferenciaPorInsumo = useMemo(() => {
+    const map = new Map<string, number | null>();
+    for (const c of custoReferenciaData) {
+      map.set(c.insumo_id, c.preco_medio_comprado ?? c.preco_medio_cotado_vencedor ?? null);
+    }
+    return map;
+  }, [custoReferenciaData]);
   const createMut = useCreateInsumo();
   const updateMut = useUpdateInsumo();
   const toggleMut = useToggleInsumoAtivo();
@@ -77,6 +88,8 @@ const Insumos = () => {
   const [descricao, setDescricao] = useState("");
   const [codigo, setCodigo] = useState("");
   const [tipo, setTipo] = useState<string>("material");
+  const [categoria, setCategoria] = useState("");
+  const [subcategoria, setSubcategoria] = useState("");
   const [unidade, setUnidade] = useState("");
   const [precoStr, setPrecoStr] = useState("");
   const [fonte, setFonte] = useState<string>("proprio");
@@ -107,6 +120,8 @@ const Insumos = () => {
       setDescricao(i.descricao);
       setCodigo(i.codigo || "");
       setTipo(i.tipo);
+      setCategoria(i.categoria || "");
+      setSubcategoria(i.subcategoria || "");
       setUnidade(i.unidade);
       setPrecoStr(String(i.preco_unitario));
       setFonte(i.fonte);
@@ -117,6 +132,8 @@ const Insumos = () => {
       setDescricao("");
       setCodigo("");
       setTipo("material");
+      setCategoria("");
+      setSubcategoria("");
       setUnidade("");
       setPrecoStr("");
       setFonte("proprio");
@@ -136,6 +153,8 @@ const Insumos = () => {
       descricao: descricao.trim(),
       codigo: codigo.trim() || null,
       tipo,
+      categoria: categoria.trim() || null,
+      subcategoria: subcategoria.trim() || null,
       unidade: unidade.trim(),
       preco_unitario: preco,
       fonte,
@@ -220,7 +239,7 @@ const Insumos = () => {
         <PageLoading />
       ) : (
         <DataTable
-          columns={insumoColumns(canEdit, openForm, toggleAtivo)}
+          columns={insumoColumns(canEdit, openForm, toggleAtivo, custoReferenciaPorInsumo)}
           data={filtered}
           hideSearch
           pageSize={50}
@@ -292,6 +311,26 @@ const Insumos = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
+                <Label>Categoria</Label>
+                <Input
+                  value={categoria}
+                  onChange={(e) => setCategoria(e.target.value)}
+                  placeholder="Ex: Elétrico"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label>Subcategoria</Label>
+                <Input
+                  value={subcategoria}
+                  onChange={(e) => setSubcategoria(e.target.value)}
+                  placeholder="Ex: Cabos"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
                 <Label>Fonte</Label>
                 <Select value={fonte} onValueChange={setFonte}>
                   <SelectTrigger className="mt-1">
@@ -342,6 +381,7 @@ function insumoColumns(
   canEdit: boolean,
   openForm: (i: Insumo) => void,
   toggleAtivo: (i: Insumo) => void,
+  custoReferenciaPorInsumo: Map<string, number | null>,
 ): ColumnDef<Insumo, any>[] {
   const cols: ColumnDef<Insumo, any>[] = [
     {
@@ -361,15 +401,39 @@ function insumoColumns(
         </Badge>
       ),
     },
+    {
+      id: "categoria",
+      header: "Categoria",
+      cell: ({ row }) => {
+        const { categoria, subcategoria } = row.original;
+        if (!categoria && !subcategoria) return <span className="text-muted-foreground">—</span>;
+        return (
+          <span className="text-xs text-muted-foreground">
+            {[categoria, subcategoria].filter(Boolean).join(" > ")}
+          </span>
+        );
+      },
+    },
     { accessorKey: "unidade", header: "Un." },
     {
       accessorKey: "preco_unitario",
       header: "Preço unit.",
-      cell: ({ row }) => (
-        <div className="text-right tabular-nums">
-          {formatBRL(Number(row.original.preco_unitario), { minDigits: 4 })}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const cadastrado = Number(row.original.preco_unitario);
+        const referencia = custoReferenciaPorInsumo.get(row.original.id);
+        const divergente =
+          referencia != null && Math.abs(referencia - cadastrado) > cadastrado * 0.05;
+        return (
+          <div className="text-right">
+            <div className="tabular-nums">{formatBRL(cadastrado, { minDigits: 4 })}</div>
+            {divergente && (
+              <div className="text-[10px] text-muted-foreground tabular-nums">
+                compra real: {formatBRL(referencia, { minDigits: 4 })}
+              </div>
+            )}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "fonte",

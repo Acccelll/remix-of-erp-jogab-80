@@ -7,6 +7,7 @@ import {
   type FornecedorRow,
   type FornecedorInsert,
   type FornecedorUpdate,
+  type FornecedorHistoricoRow,
 } from "@/lib/repositories/fornecedores";
 import { queryKey } from "@/lib/query-keys";
 import { validarFornecedor } from "@/lib/schemas/fornecedor";
@@ -25,6 +26,7 @@ export const fornecedoresKeys = {
   resumo: queryKey("fornecedores", "resumo"),
   resumoAtivos: queryKey("fornecedores", "resumo-ativos"),
   contatos: queryKey("fornecedores", "contatos"),
+  historico: queryKey("fornecedores", "historico"),
 };
 
 export function useFornecedoresCompleto(options?: { enabled?: boolean }) {
@@ -60,6 +62,15 @@ export function useFornecedoresContatos(options?: { enabled?: boolean }) {
     queryFn: () => fornecedoresRepo.listContatos() as Promise<FornecedorContato[]>,
     enabled: options?.enabled ?? true,
     staleTime: 30_000,
+  });
+}
+
+export function useFornecedorHistorico(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: fornecedoresKeys.historico,
+    queryFn: () => fornecedoresRepo.listHistorico() as Promise<FornecedorHistoricoRow[]>,
+    enabled: options?.enabled ?? true,
+    staleTime: 60_000,
   });
 }
 
