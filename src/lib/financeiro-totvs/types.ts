@@ -81,7 +81,8 @@ export const STATUS_TOTVS_LEGENDA: Record<number, string> = {
 /** Linha operacional de rateio Natureza × Centro de Custo × Obra. */
 export interface RateioManualInput {
   cod_natureza: string;
-  centro_custo: string;
+  /** Obrigatório na criação canônica; opcional apenas para compatibilidade da edição legada até a Etapa 6. */
+  centro_custo?: string;
   valor_rateio: number;
 }
 
