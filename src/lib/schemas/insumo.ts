@@ -37,6 +37,12 @@ export const insumoSchema = z
     const codigo = text(val.codigo);
     if (codigo.length > 40) addIssue(ctx, "codigo", "Máx. 40 caracteres");
 
+    const categoria = text(val.categoria);
+    if (categoria.length > 80) addIssue(ctx, "categoria", "Máx. 80 caracteres");
+
+    const subcategoria = text(val.subcategoria);
+    if (subcategoria.length > 80) addIssue(ctx, "subcategoria", "Máx. 80 caracteres");
+
     const unidade = text(val.unidade).toLowerCase();
     if (!unidade) addIssue(ctx, "unidade", "Unidade é obrigatória");
     else if (!UNIDADES_VALIDAS.has(unidade))

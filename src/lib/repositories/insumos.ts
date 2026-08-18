@@ -3,9 +3,29 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { REPO_LIMITS } from "./_limits";
 
-export type InsumoRow = Database["public"]["Tables"]["insumos"]["Row"];
-export type InsumoInsert = Database["public"]["Tables"]["insumos"]["Insert"];
-export type InsumoUpdate = Database["public"]["Tables"]["insumos"]["Update"];
+// categoria/subcategoria são colunas novas (ver migration Fase 1) ainda não
+// refletidas em types.ts — estendidas manualmente até a próxima regeneração.
+export type InsumoRow = Database["public"]["Tables"]["insumos"]["Row"] & {
+  categoria: string | null;
+  subcategoria: string | null;
+};
+export type InsumoInsert = Database["public"]["Tables"]["insumos"]["Insert"] & {
+  categoria?: string | null;
+  subcategoria?: string | null;
+};
+export type InsumoUpdate = Database["public"]["Tables"]["insumos"]["Update"] & {
+  categoria?: string | null;
+  subcategoria?: string | null;
+};
+
+export type InsumoCustoReferenciaRow = {
+  insumo_id: string;
+  descricao: string;
+  preco_cadastrado: number;
+  preco_medio_cotado_vencedor: number | null;
+  preco_medio_comprado: number | null;
+  ultima_compra_em: string | null;
+};
 
 function unwrap<T>(res: { data: T | null; error: unknown }): T {
   if (res.error) throw res.error as Error;
@@ -22,7 +42,7 @@ function unwrap<T>(res: { data: T | null; error: unknown }): T {
  */
 export const insumosRepo = {
   async listCompleto(
-    cols: string = "id, codigo, descricao, tipo, unidade, preco_unitario, fonte, referencia_externa, ativo, created_at, updated_at",
+    cols: string = "id, codigo, descricao, tipo, categoria, subcategoria, unidade, preco_unitario, fonte, referencia_externa, ativo, created_at, updated_at",
   ): Promise<InsumoRow[]> {
     return (
       (unwrap(
@@ -77,6 +97,11 @@ export const insumosRepo = {
           .select("id, descricao, unidade, preco_unitario")
           .limit(REPO_LIMITS.insumos),
       ) ?? []
+    );
+  },
+  async listCustoReferencia(): Promise<InsumoCustoReferenciaRow[]> {
+    return (
+      unwrap(await supabase.from("vw_insumo_custo_referencia").select("*")) ?? []
     );
   },
   async create(payload: InsumoInsert): Promise<void> {

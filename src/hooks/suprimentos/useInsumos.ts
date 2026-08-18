@@ -7,6 +7,7 @@ import {
   type InsumoRow,
   type InsumoInsert,
   type InsumoUpdate,
+  type InsumoCustoReferenciaRow,
 } from "@/lib/repositories/insumos";
 import { queryKey } from "@/lib/query-keys";
 import { validarInsumo } from "@/lib/schemas/insumo";
@@ -30,6 +31,7 @@ export const insumosKeys = {
   ativos: queryKey("insumos", "ativos"),
   precos: queryKey("insumos", "precos"),
   resumoPrecos: queryKey("insumos", "resumo-precos"),
+  custoReferencia: queryKey("insumos", "custo-referencia"),
 };
 
 export function useInsumosCompleto(options?: { enabled?: boolean }) {
@@ -74,6 +76,15 @@ export function useInsumosResumoPrecos(options?: { enabled?: boolean }) {
     queryFn: () => insumosRepo.listResumoPrecos() as Promise<InsumoResumoPreco[]>,
     enabled: options?.enabled ?? true,
     staleTime: 30_000,
+  });
+}
+
+export function useInsumosCustoReferencia(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: insumosKeys.custoReferencia,
+    queryFn: () => insumosRepo.listCustoReferencia() as Promise<InsumoCustoReferenciaRow[]>,
+    enabled: options?.enabled ?? true,
+    staleTime: 60_000,
   });
 }
 

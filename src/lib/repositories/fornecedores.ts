@@ -7,6 +7,19 @@ export type FornecedorRow = Database["public"]["Tables"]["fornecedores"]["Row"];
 export type FornecedorInsert = Database["public"]["Tables"]["fornecedores"]["Insert"];
 export type FornecedorUpdate = Database["public"]["Tables"]["fornecedores"]["Update"];
 
+// vw_fornecedor_historico ainda não está em types.ts (view nova, tipos não
+// regenerados neste ciclo) — tipado manualmente aqui, único ponto de contato.
+export type FornecedorHistoricoRow = {
+  fornecedor_id: string;
+  razao_social: string;
+  total_cotacoes: number;
+  cotacoes_vencidas: number;
+  taxa_vitoria_pct: number | null;
+  preco_medio_vencedor: number | null;
+  prazo_medio_prometido_dias: number | null;
+  prazo_medio_real_dias: number | null;
+};
+
 function unwrap<T>(res: { data: T | null; error: unknown }): T {
   if (res.error) throw res.error as Error;
   return res.data as T;
@@ -65,6 +78,13 @@ export const fornecedoresRepo = {
           .select("id, razao_social, nome_fantasia, contato, email, telefone, ativo")
           .order("razao_social")
           .limit(REPO_LIMITS.fornecedores),
+      ) ?? []
+    );
+  },
+  async listHistorico(): Promise<FornecedorHistoricoRow[]> {
+    return (
+      unwrap(
+        await supabase.from("vw_fornecedor_historico").select("*").order("razao_social"),
       ) ?? []
     );
   },

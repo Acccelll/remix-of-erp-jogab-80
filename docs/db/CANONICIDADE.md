@@ -11,6 +11,29 @@ entre bancos/schemas e quais são **espelhos read-only**.
 | ----------- | ---------------------------------- | ---------------------------- | -------------------------------------- |
 | Colaborador | `public.colaboradores`             | `public.players`             | **nenhuma** — sincronização derivada   |
 | Obra        | `public.obras`                     | `public.centros_custo_totvs` | somente import TOTVS (service_role)    |
+| Cliente     | `public.clientes` (Postgres)       | `clientes` (MySQL)           | **nenhuma hoje** — ver nota abaixo     |
+
+> **Cliente — ciclo "fechado → reaberto" (registrado em 2026-08-18).**
+> Cliente já foi um módulo fechado no MySQL — a tabela `clientes` de lá tem
+> schema financeiro completo (`prazo_pagamento_dias`, alíquotas, endereço) e
+> uma rota viva em `api.php` (`case 'clientes'`). Ele foi **reaberto** para uma
+> nova rodada de desenvolvimento em Postgres (`public.clientes`), que hoje é a
+> tabela que toda a UI (CRM e Financeiro) efetivamente lê e escreve — via
+> `src/lib/repositories/clientes.ts`/`useClientes.ts`, sem nenhuma chamada a
+> `api.php`.
+>
+> A versão Postgres, porém, é um recorte mais enxuto que a do MySQL: não tem
+> `ativa`, `contato`, `email`, nem os campos de endereço (cep/logradouro/
+> numero/bairro/municipio/uf), e não tem equivalente à feature de
+> `cliente_responsaveis` (responsáveis de negociação, MySQL). Esses dados
+> ficam deliberadamente adormecidos em Postgres até o fechamento deste ciclo.
+>
+> **Enquanto este ciclo não fechar**: tratar `public.clientes` (Postgres) como
+> fonte de verdade operacional — é nela que a UI lê e escreve. A tabela
+> `clientes` do MySQL é o último estado fechado do módulo, não deve receber
+> escrita nova, e servirá de base de reconciliação quando Cliente fechar
+> novamente (chave de correlação candidata: `cnpj` — checar unicidade/nulos
+> antes de usar como chave real, não há FK cruzada declarada hoje).
 
 > **Divergência conhecida entre esta matriz e o runtime (2026-07-30).**
 > A matriz declara o Postgres canônico para Colaborador, mas o domínio roda

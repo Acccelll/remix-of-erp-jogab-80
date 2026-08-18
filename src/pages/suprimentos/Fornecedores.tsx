@@ -3,6 +3,7 @@ import {
   useFornecedoresCompleto,
   useCreateFornecedor,
   useUpdateFornecedor,
+  useFornecedorHistorico,
 } from "@/hooks/suprimentos/useFornecedores";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Search, Eye, EyeOff, Truck, Pencil, Loader2, X } from "lucide-react";
+import { Plus, Search, Eye, EyeOff, Truck, Pencil, Loader2, X, BarChart3 } from "lucide-react";
 import { PageLoading } from "@/components/common/PageLoading";
 
 type Fornecedor = {
@@ -54,6 +55,13 @@ const Fornecedores = () => {
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Fornecedor | null>(null);
+
+  const historicoQuery = useFornecedorHistorico();
+  const [historicoFornecedorId, setHistoricoFornecedorId] = useState<string | null>(null);
+  const historicoSelecionado = useMemo(
+    () => (historicoQuery.data ?? []).find((h) => h.fornecedor_id === historicoFornecedorId),
+    [historicoQuery.data, historicoFornecedorId],
+  );
 
   const [razao, setRazao] = useState("");
   const [fantasia, setFantasia] = useState("");
@@ -208,6 +216,14 @@ const Fornecedores = () => {
                   </p>
                 )}
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setHistoricoFornecedorId(f.id)}
+                title="Ver histórico de cotações e compras"
+              >
+                <BarChart3 className="h-4 w-4 mr-1" /> Histórico
+              </Button>
               <Button variant="ghost" size="sm" onClick={() => openForm(f)}>
                 <Pencil className="h-4 w-4 mr-1" /> Editar
               </Button>
@@ -300,6 +316,71 @@ const Fornecedores = () => {
             <Button onClick={handleSave} disabled={saving || !razao.trim()}>
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!historicoFornecedorId}
+        onOpenChange={(v) => !v && setHistoricoFornecedorId(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" /> Histórico de cotações e compras
+            </DialogTitle>
+          </DialogHeader>
+          {historicoQuery.isLoading ? (
+            <PageLoading />
+          ) : !historicoSelecionado || historicoSelecionado.total_cotacoes === 0 ? (
+            <p className="text-sm text-muted-foreground py-4">
+              Nenhuma cotação registrada para este fornecedor ainda.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 py-2">
+              <div>
+                <p className="text-xs text-muted-foreground">Cotações participadas</p>
+                <p className="text-lg font-semibold">{historicoSelecionado.total_cotacoes}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Taxa de vitória</p>
+                <p className="text-lg font-semibold">
+                  {historicoSelecionado.taxa_vitoria_pct ?? "—"}%
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Preço médio (propostas vencedoras)</p>
+                <p className="text-lg font-semibold">
+                  {historicoSelecionado.preco_medio_vencedor != null
+                    ? historicoSelecionado.preco_medio_vencedor.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Prazo médio prometido</p>
+                <p className="text-lg font-semibold">
+                  {historicoSelecionado.prazo_medio_prometido_dias != null
+                    ? `${historicoSelecionado.prazo_medio_prometido_dias} dias`
+                    : "—"}
+                </p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-xs text-muted-foreground">Prazo médio real de entrega</p>
+                <p className="text-lg font-semibold">
+                  {historicoSelecionado.prazo_medio_real_dias != null
+                    ? `${historicoSelecionado.prazo_medio_real_dias} dias`
+                    : "—"}
+                </p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setHistoricoFornecedorId(null)}>
+              Fechar
             </Button>
           </DialogFooter>
         </DialogContent>
