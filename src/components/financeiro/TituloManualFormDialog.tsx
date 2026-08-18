@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 
 import { financeiroRepo, planoContasRepo } from "@/lib/repositories/financeiro";
+import { listarTiposDocumentoFinanceiro } from "@/lib/repositories/financeiro-tipos-documento";
 import { criarTituloManualCanonicoV3 } from "@/lib/repositories/financeiro-titulos-manual";
 import { brl } from "@/lib/billing";
 import { finKeys } from "@/lib/financeiro-totvs/queries";
@@ -116,6 +117,12 @@ export function TituloManualFormDialog({
     queryFn: () => planoContasRepo.list(),
     enabled: open,
   });
+  const { data: tiposDocumento } = useQuery({
+    queryKey: ["fin_tipos_documento_select"],
+    queryFn: listarTiposDocumentoFinanceiro,
+    enabled: open && !isEdicao,
+  });
+
   const naturezasAtivas = useMemo(
     () => (naturezas ?? []).filter((n: any) => n.ativo !== false),
     [naturezas],
@@ -135,6 +142,14 @@ export function TituloManualFormDialog({
         label: `${c.codigo} — ${c.nome ?? c.codigo}`,
       })),
     [centros],
+  );
+  const tipoDocumentoOptions = useMemo(
+    () =>
+      (tiposDocumento ?? []).map((tipo) => ({
+        value: tipo.codigo,
+        label: `${tipo.codigo} — ${tipo.descricao}`,
+      })),
+    [tiposDocumento],
   );
 
   const totalRateio = useMemo(
@@ -235,10 +250,14 @@ export function TituloManualFormDialog({
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label>Tipo de Documento</Label>
-                <Input
+                <FinanceiroSearchCombobox
                   value={tipoDocumento}
-                  onChange={(e) => setTipoDocumento(e.target.value)}
-                  placeholder="Ex.: 04, 39, NF, BOL"
+                  onValueChange={setTipoDocumento}
+                  options={tipoDocumentoOptions}
+                  placeholder="Selecione o tipo de documento"
+                  searchPlaceholder="Pesquisar por código ou descrição…"
+                  emptyText="Nenhum tipo de documento encontrado."
+                  ariaLabel="Tipo de Documento"
                 />
               </div>
               <div className="space-y-1.5">
