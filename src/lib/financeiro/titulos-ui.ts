@@ -139,5 +139,5 @@ export function temFiltrosTitulosAtivos(filtros: FiltrosTitulos): boolean {
 }
 
 export function documentoTitulo(titulo: Pick<TituloCanonicoResumo, "numero_documento" | "id">): string {
-  return titulo.numero_documento?.trim() || `ERP-${titulo.id.replaceAll("-", "").slice(0, 8).toUpperCase()}`;
+  return titulo.numero_documento?.trim() || `ERP-${titulo.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
 }
