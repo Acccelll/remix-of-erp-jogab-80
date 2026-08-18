@@ -1,3 +1,4 @@
+/** @module-kind pure */
 import type { TituloCanonicoResumo } from "@/lib/repositories/financeiro-titulos";
 
 export type StatusVisualTitulo = "aberto" | "parcial" | "baixado" | "cancelado" | "vencido";
