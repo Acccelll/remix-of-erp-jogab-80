@@ -3,13 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { withDeadline } from "@/lib/core/http/withDeadline";
 import type { TituloManualInput } from "@/lib/financeiro-totvs/types";
 
+const FINANCEIRO_TITULOS_ROOT = ["financeiro", "titulos-canonicos"] as const;
+
 export const financeiroTitulosKeys = {
-  all: ["financeiro", "titulos-canonicos"] as const,
-  list: () => [...financeiroTitulosKeys.all, "list"] as const,
-  detail: (tituloId: string) => [...financeiroTitulosKeys.all, "detail", tituloId] as const,
-  rateios: (tituloId: string) => [...financeiroTitulosKeys.detail(tituloId), "rateios"] as const,
-  baixas: (tituloId: string) => [...financeiroTitulosKeys.detail(tituloId), "baixas"] as const,
-  eventos: (tituloId: string) => [...financeiroTitulosKeys.detail(tituloId), "eventos"] as const,
+  all: FINANCEIRO_TITULOS_ROOT,
+  list: () => [...FINANCEIRO_TITULOS_ROOT, "list"] as const,
+  detail: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId] as const,
+  rateios: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId, "rateios"] as const,
+  baixas: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId, "baixas"] as const,
+  eventos: (tituloId: string) => [...FINANCEIRO_TITULOS_ROOT, "detail", tituloId, "eventos"] as const,
 };
 
 export interface TituloCanonicoRow {
@@ -106,6 +108,34 @@ export interface EventoTituloRow {
   criado_em: string;
 }
 
+interface RateioTituloRaw {
+  id: string;
+  titulo_id: string;
+  cod_natureza: string;
+  centro_custo: string;
+  obra_id: string | null;
+  valor: number | string | null;
+  percentual: number | string | null;
+  criado_em: string;
+  criado_por: string | null;
+}
+
+interface NaturezaLookupRow {
+  cod_natureza: string;
+  descricao: string | null;
+}
+
+interface CentroCustoLookupRow {
+  codigo: string;
+  descricao: string | null;
+}
+
+interface ObraLookupRow {
+  id: string;
+  codigo: string | null;
+  nome: string | null;
+}
+
 const TITULO_COLS =
   "id,tipo,empresa_id,filial,contraparte_id,cnpj_cpf,nome,nome_fantasia,tipo_documento,numero_documento,serie_documento,parcela_numero,parcela_total,data_emissao,data_competencia,data_vencimento,data_previsao_baixa,valor_original,valor_desconto,valor_juros,valor_multa,valor_acrescimos,valor_retencoes,valor_liquido,centro_custo,obra_id,historico,observacao,origem_tipo,origem_ref,status,criado_em,criado_por,atualizado_em,atualizado_por,cancelado_em,cancelado_por";
 
@@ -127,21 +157,19 @@ async function listarTitulosRows(pageSize = 1000): Promise<TituloCanonicoRow[]> 
       .order("criado_em", { ascending: false })
       .range(from, from + pageSize - 1);
     if (error) throw new Error(error.message);
-    const page = (data ?? []) as Array<Record<string, unknown>>;
+
+    const page = (data ?? []) as TituloCanonicoRow[];
     rows.push(
-      ...page.map(
-        (row) =>
-          ({
-            ...row,
-            valor_original: numeric(row.valor_original),
-            valor_desconto: numeric(row.valor_desconto),
-            valor_juros: numeric(row.valor_juros),
-            valor_multa: numeric(row.valor_multa),
-            valor_acrescimos: numeric(row.valor_acrescimos),
-            valor_retencoes: numeric(row.valor_retencoes),
-            valor_liquido: numeric(row.valor_liquido),
-          }) as TituloCanonicoRow,
-      ),
+      ...page.map((row) => ({
+        ...row,
+        valor_original: numeric(row.valor_original),
+        valor_desconto: numeric(row.valor_desconto),
+        valor_juros: numeric(row.valor_juros),
+        valor_multa: numeric(row.valor_multa),
+        valor_acrescimos: numeric(row.valor_acrescimos),
+        valor_retencoes: numeric(row.valor_retencoes),
+        valor_liquido: numeric(row.valor_liquido),
+      })),
     );
     if (page.length < pageSize) break;
   }
@@ -156,19 +184,17 @@ async function listarSaldosRows(pageSize = 1000): Promise<TituloSaldoRow[]> {
       .select(SALDO_COLS)
       .range(from, from + pageSize - 1);
     if (error) throw new Error(error.message);
-    const page = (data ?? []) as Array<Record<string, unknown>>;
+
+    const page = (data ?? []) as TituloSaldoRow[];
     rows.push(
-      ...page.map(
-        (row) =>
-          ({
-            ...row,
-            valor_liquido: numeric(row.valor_liquido),
-            valor_baixado: numeric(row.valor_baixado),
-            saldo_aberto: numeric(row.saldo_aberto),
-            valor_movimentado: numeric(row.valor_movimentado),
-            qtd_baixas: numeric(row.qtd_baixas),
-          }) as TituloSaldoRow,
-      ),
+      ...page.map((row) => ({
+        ...row,
+        valor_liquido: numeric(row.valor_liquido),
+        valor_baixado: numeric(row.valor_baixado),
+        saldo_aberto: numeric(row.saldo_aberto),
+        valor_movimentado: numeric(row.valor_movimentado),
+        qtd_baixas: numeric(row.qtd_baixas),
+      })),
     );
     if (page.length < pageSize) break;
   }
@@ -181,7 +207,8 @@ async function listarSaldosRows(pageSize = 1000): Promise<TituloSaldoRow[]> {
  */
 export async function listarTitulosCanonicos(): Promise<TituloCanonicoResumo[]> {
   const [titulos, saldos] = await Promise.all([listarTitulosRows(), listarSaldosRows()]);
-  const saldoPorTitulo = new Map(saldos.map((saldo) => [saldo.titulo_id, saldo]));
+  const saldoPorTitulo = new Map<string, TituloSaldoRow>();
+  for (const saldo of saldos) saldoPorTitulo.set(saldo.titulo_id, saldo);
 
   return titulos.map((titulo) => {
     const saldo = saldoPorTitulo.get(titulo.id);
@@ -214,58 +241,60 @@ export async function listarRateiosTitulo(tituloId: string): Promise<RateioTitul
   );
   if (error) throw new Error(error.message);
 
-  const rows = (data ?? []) as Array<Record<string, unknown>>;
+  const rows = (data ?? []) as RateioTituloRaw[];
   if (!rows.length) return [];
 
-  const naturezas = [...new Set(rows.map((row) => String(row.cod_natureza ?? "")).filter(Boolean))];
-  const centros = [...new Set(rows.map((row) => String(row.centro_custo ?? "")).filter(Boolean))];
-  const obras = [...new Set(rows.map((row) => String(row.obra_id ?? "")).filter(Boolean))];
+  const naturezas = [...new Set(rows.map((row) => row.cod_natureza).filter(Boolean))];
+  const centros = [...new Set(rows.map((row) => row.centro_custo).filter(Boolean))];
+  const obras = [...new Set(rows.map((row) => row.obra_id).filter((id): id is string => Boolean(id)))];
 
   const [naturezasRes, centrosRes, obrasRes] = await Promise.all([
     naturezas.length
       ? (supabase as any).from("plano_contas").select("cod_natureza,descricao").in("cod_natureza", naturezas)
-      : Promise.resolve({ data: [], error: null }),
+      : Promise.resolve({ data: [] as NaturezaLookupRow[], error: null }),
     centros.length
       ? (supabase as any).from("centros_custo_totvs").select("codigo,descricao").in("codigo", centros)
-      : Promise.resolve({ data: [], error: null }),
+      : Promise.resolve({ data: [] as CentroCustoLookupRow[], error: null }),
     obras.length
       ? (supabase as any).from("obras").select("id,codigo,nome").in("id", obras)
-      : Promise.resolve({ data: [], error: null }),
+      : Promise.resolve({ data: [] as ObraLookupRow[], error: null }),
   ]);
 
   if (naturezasRes.error) throw new Error(naturezasRes.error.message);
   if (centrosRes.error) throw new Error(centrosRes.error.message);
   if (obrasRes.error) throw new Error(obrasRes.error.message);
 
-  const naturezaMap = new Map(
-    (naturezasRes.data ?? []).map((row: any) => [String(row.cod_natureza), row.descricao ?? null]),
-  );
-  const centroMap = new Map(
-    (centrosRes.data ?? []).map((row: any) => [String(row.codigo), row.descricao ?? null]),
-  );
-  const obraMap = new Map(
-    (obrasRes.data ?? []).map((row: any) => [String(row.id), row]),
-  );
+  const naturezaMap = new Map<string, string | null>();
+  for (const row of (naturezasRes.data ?? []) as NaturezaLookupRow[]) {
+    naturezaMap.set(String(row.cod_natureza), row.descricao ?? null);
+  }
+
+  const centroMap = new Map<string, string | null>();
+  for (const row of (centrosRes.data ?? []) as CentroCustoLookupRow[]) {
+    centroMap.set(String(row.codigo), row.descricao ?? null);
+  }
+
+  const obraMap = new Map<string, ObraLookupRow>();
+  for (const row of (obrasRes.data ?? []) as ObraLookupRow[]) {
+    obraMap.set(String(row.id), row);
+  }
 
   return rows.map((row) => {
-    const codNatureza = String(row.cod_natureza);
-    const centroCusto = String(row.centro_custo);
-    const obraId = row.obra_id ? String(row.obra_id) : null;
-    const obra = obraId ? obraMap.get(obraId) : null;
+    const obra = row.obra_id ? obraMap.get(row.obra_id) : undefined;
     return {
-      id: String(row.id),
-      titulo_id: String(row.titulo_id),
-      cod_natureza: codNatureza,
-      desc_natureza: naturezaMap.get(codNatureza) ?? null,
-      centro_custo: centroCusto,
-      desc_centro_custo: centroMap.get(centroCusto) ?? null,
-      obra_id: obraId,
+      id: row.id,
+      titulo_id: row.titulo_id,
+      cod_natureza: row.cod_natureza,
+      desc_natureza: naturezaMap.get(row.cod_natureza) ?? null,
+      centro_custo: row.centro_custo,
+      desc_centro_custo: centroMap.get(row.centro_custo) ?? null,
+      obra_id: row.obra_id,
       obra_codigo: obra?.codigo ?? null,
       obra_nome: obra?.nome ?? null,
       valor: row.valor == null ? null : numeric(row.valor),
       percentual: row.percentual == null ? null : numeric(row.percentual),
-      criado_em: String(row.criado_em),
-      criado_por: row.criado_por ? String(row.criado_por) : null,
+      criado_em: row.criado_em,
+      criado_por: row.criado_por,
     };
   });
 }
