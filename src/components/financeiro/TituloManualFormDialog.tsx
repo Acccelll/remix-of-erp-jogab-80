@@ -155,7 +155,7 @@ export function TituloManualFormDialog({
         }
         await financeiroRepo.rpcEditarTituloManual(edicao!.ref_lancamento, {
           ...input,
-          centro_custo: rateiosPayload[0].centro_custo,
+          centro_custo: rateiosPayload[0].centro_custo ?? "",
         });
       } else {
         await criarTituloManualCanonico(input);
