@@ -64,6 +64,54 @@ export const EXTENSOES: ExtensaoDef[] = [
     suportaResumo: false,
     acoes: [],
   },
+  {
+    codigo: "locacao",
+    nome: "Locações",
+    descricao: "Vincula o card a um contrato de locação (equipamento/serviço) do ERP.",
+    icone: "FileSignature",
+    versao: "1.0.0",
+    modulo: "contratos",
+    entityTypes: ["locacao"],
+    cardTipos: [],
+    painelOrdem: 40,
+    // Fonte é MySQL — sem verificação server-side de existência/situação
+    // (ver kanban_entidade_info); resumo vem só do adapter no frontend.
+    suportaResumo: true,
+    acoes: [],
+  },
+  {
+    codigo: "patrimonio",
+    nome: "Patrimônios",
+    descricao: "Vincula o card a um patrimônio do ERP.",
+    icone: "Boxes",
+    versao: "1.0.0",
+    modulo: "patrimonios",
+    entityTypes: ["patrimonio"],
+    cardTipos: [],
+    painelOrdem: 50,
+    suportaResumo: true,
+    acoes: [],
+  },
+  {
+    codigo: "romaneio",
+    nome: "Romaneios",
+    descricao: "Vincula o card a um romaneio de logística de ativos.",
+    icone: "Truck",
+    versao: "1.0.0",
+    modulo: "logistica_ativos",
+    entityTypes: ["romaneio"],
+    cardTipos: [],
+    painelOrdem: 60,
+    suportaResumo: true,
+    acoes: [
+      {
+        codigo: "revalidar_vinculos",
+        rotulo: "Revalidar vínculos",
+        descricao: "Reconsulta a fonte oficial e registra o resultado no histórico.",
+        exigeEdicao: true,
+      },
+    ],
+  },
 ];
 
 const porCodigo = new Map(EXTENSOES.map((e) => [e.codigo, e]));

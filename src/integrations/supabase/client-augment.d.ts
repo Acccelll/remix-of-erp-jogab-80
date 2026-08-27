@@ -70,6 +70,8 @@ type MissingTables =
   // Trello / cards
   | "cards"
   | "card_comentarios"
+  // Logística de ativos
+  | "romaneios"
   // Empresas / setores
   | "empresas"
   | "user_empresas"

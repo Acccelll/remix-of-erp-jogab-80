@@ -3,7 +3,7 @@
 > Auto-gerado por `scripts/db/gen-migrations-index.py` (DB-003 · Onda 1).
 > Regeração: `python3 scripts/db/gen-migrations-index.py`.
 
-Total: **280** migrations · janela: 2026-04-02 11:38 → 2026-08-27 12:21
+Total: **281** migrations · janela: 2026-04-02 11:38 → 2026-08-27 13:30
 
 | # | Data/Hora | Arquivo | Ementa (primeira linha) |
 |--:|-----------|---------|-------------------------|
@@ -287,3 +287,4 @@ Total: **280** migrations · janela: 2026-04-02 11:38 → 2026-08-27 12:21
 | 278 | 2026-08-27 11:40 | `20260827114038_4c3dd166-4e5c-41fa-8bc0-ab07fde0f9af.sql` | Limpeza de schema morto (system design §4.2): 15 tabelas + 1 função Postgres |
 | 279 | 2026-08-27 12:02 | `20260827120257_b6b986c4-895c-4c05-86d7-4d4eab73726e.sql` | Kanban (system design §3.4/§5.3): remove `cards.cover_color`/`cards.cover_url`, |
 | 280 | 2026-08-27 12:21 | `20260827122130_67a1261d-d412-44b4-a3ad-0af83d8c8e9e.sql` | Kanban (system design §8, item 6.3): sincroniza `cards.obra_id`/ |
+| 281 | 2026-08-27 13:30 | `20260827133008_e8c86b2c-fb4c-45d7-bd92-e0606124b1c6.sql` | Kanban (system design §5.3/§8, item 6.4): estende a camada de vínculos |

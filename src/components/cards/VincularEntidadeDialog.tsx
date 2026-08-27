@@ -21,7 +21,7 @@ import { useBuscaEntidades, useCriarVinculo } from "@/hooks/quadros/useExtensoes
 import { getAdapter } from "@/lib/quadros/extensoes/adapters";
 import { getExtensao, listExtensoes } from "@/lib/quadros/extensoes/registry";
 import { validarNovoVinculo } from "@/lib/quadros/extensoes/vinculos";
-import type { CardVinculo } from "@/lib/quadros/extensoes/tipos";
+import type { CardVinculo, EntidadeResumo } from "@/lib/quadros/extensoes/tipos";
 
 interface Props {
   open: boolean;
@@ -55,9 +55,9 @@ export default function VincularEntidadeDialog({
   const { data: resultados = [], isLoading } = useBuscaEntidades(tipoEfetivo, termo, open);
   const criar = useCriarVinculo(cardId);
 
-  async function vincular(entityId: string) {
+  async function vincular(entidade: EntidadeResumo) {
     const check = validarNovoVinculo(
-      { extensao_codigo: extensao, entity_type: tipoEfetivo, entity_id: entityId },
+      { extensao_codigo: extensao, entity_type: tipoEfetivo, entity_id: entidade.id },
       { vinculosAtuais, extensoesAtivas, cardTipoCodigo, podeEditar },
     );
     if (!check.ok) {
@@ -65,7 +65,12 @@ export default function VincularEntidadeDialog({
       return;
     }
     try {
-      await criar.mutateAsync({ extensao, entityType: tipoEfetivo, entityId });
+      await criar.mutateAsync({
+        extensao,
+        entityType: tipoEfetivo,
+        entityId: entidade.id,
+        nomeExibicao: getAdapter(entidade.entityType)?.getEntityDisplayName(entidade) ?? entidade.nome,
+      });
       toast.success("Vínculo criado.");
       onOpenChange(false);
     } catch (e) {
@@ -144,7 +149,7 @@ export default function VincularEntidadeDialog({
                   key={r.id}
                   type="button"
                   disabled={!podeEditar || criar.isPending}
-                  onClick={() => vincular(r.id)}
+                  onClick={() => vincular(r)}
                   className="flex w-full items-center justify-between rounded px-2 py-2 text-left text-sm hover:bg-accent disabled:opacity-50"
                 >
                   <span className="truncate">

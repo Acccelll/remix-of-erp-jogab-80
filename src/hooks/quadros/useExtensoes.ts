@@ -114,6 +114,7 @@ export function useCriarVinculo(cardId: string) {
       entityId: string;
       relationship?: string;
       isPrimary?: boolean;
+      nomeExibicao?: string;
     }) => cardVinculosRepo.criar({ cardId, ...input }),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: extensoesKeys.vinculos(cardId) });

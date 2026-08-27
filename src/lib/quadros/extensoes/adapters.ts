@@ -41,10 +41,45 @@ const usuarioAdapter: EntityAdapter = {
   validateRelationship: (rel) => ["responsavel", "relacionado"].includes(rel),
 };
 
+// Locação/Patrimônio: fonte é MySQL (api.php), sem rota de detalhe por id
+// hoje — a rota leva pra lista, não pro registro específico.
+const locacaoAdapter: EntityAdapter = {
+  entityType: "locacao",
+  rotulo: "Locação",
+  searchEntities: (termo, limite) => entidadesRepo.buscarLocacoes(termo, limite),
+  getEntitySummary: (id) => entidadesRepo.locacaoPorId(id),
+  getEntityDisplayName: (e) => (e.subtitulo ? `${e.nome} · ${e.subtitulo}` : e.nome),
+  getEntityRoute: () => "/contratos/lista",
+  validateRelationship: (rel) => ["contexto", "relacionado"].includes(rel),
+};
+
+const patrimonioAdapter: EntityAdapter = {
+  entityType: "patrimonio",
+  rotulo: "Patrimônio",
+  searchEntities: (termo, limite) => entidadesRepo.buscarPatrimonios(termo, limite),
+  getEntitySummary: (id) => entidadesRepo.patrimonioPorId(id),
+  getEntityDisplayName: (e) => (e.subtitulo ? `${e.nome} · ${e.subtitulo}` : e.nome),
+  getEntityRoute: () => "/patrimonios/lista",
+  validateRelationship: (rel) => ["contexto", "relacionado"].includes(rel),
+};
+
+const romaneioAdapter: EntityAdapter = {
+  entityType: "romaneio",
+  rotulo: "Romaneio",
+  searchEntities: (termo, limite) => entidadesRepo.buscarRomaneios(termo, limite),
+  getEntitySummary: (id) => entidadesRepo.romaneioPorId(id),
+  getEntityDisplayName: (e) => e.nome,
+  getEntityRoute: () => "/logistica-ativos/lista",
+  validateRelationship: (rel) => ["contexto", "relacionado"].includes(rel),
+};
+
 const ADAPTERS: Record<EntityType, EntityAdapter> = {
   obra: obraAdapter,
   cronograma_item: cronogramaAdapter,
   usuario: usuarioAdapter,
+  locacao: locacaoAdapter,
+  patrimonio: patrimonioAdapter,
+  romaneio: romaneioAdapter,
 };
 
 export function getAdapter(entityType: string): EntityAdapter | undefined {
