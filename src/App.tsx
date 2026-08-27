@@ -21,6 +21,9 @@ import ReauthDialog from "@/components/common/ReauthDialog";
 // fica no Layout (sidebar/header permanecem montados) — evita o flash branco.
 const Board = lazy(() => import("@/pages/quadros/Board"));
 const DashboardObras = lazy(() => import("@/pages/obras/DashboardObras"));
+const CampoLayout = lazy(() => import("@/pages/campo/CampoLayout"));
+const CampoHome = lazy(() => import("@/pages/campo/CampoHome"));
+const CampoRdo = lazy(() => import("@/pages/campo/CampoRdo"));
 const Histograma = lazy(() => import("@/pages/obras/Histograma"));
 const Colaboradores = lazy(() => import("@/pages/rh/Colaboradores"));
 const LogisticaColaboradores = lazy(() => import("@/pages/rh/LogisticaColaboradores"));
@@ -358,6 +361,13 @@ const ProtectedRoutes = () => {
           <Route path="/admin/empresas" element={<AdminEmpresas />} />
           <Route path="/admin/obras/importar" element={<AdminImportarObras />} />
         </Route>
+      </Route>
+      {/* Portal de Campo (system design §5.9) — shell reduzido fora do
+          `Layout` completo, pra quem só tem vínculo em `obra_membros`
+          (nenhum PageKey/setor). Redirect de entrada vive em DashboardObras. */}
+      <Route path="/campo" element={<CampoLayout />}>
+        <Route index element={<CampoHome />} />
+        <Route path="rdo" element={<CampoRdo />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
