@@ -33,10 +33,13 @@ import { useDashboardObras, type SortType } from "@/hooks/obras/useDashboardObra
 import { useMeusCartoes } from "@/hooks/quadros/useMeusCartoes";
 import { resumirMeusCartoes } from "@/lib/obras/dashboardObras";
 import { useAuth } from "@/contexts/auth/useAuth";
+import { useAcessoRestrito } from "@/hooks/campo/useAcessoRestrito";
+import { Navigate } from "react-router-dom";
 
 export default function DashboardObras() {
   const navigate = useNavigate();
   const { currentPlayer } = useAuth();
+  const { restrito, carregando } = useAcessoRestrito();
   const [sort, setSort] = useState<SortType>("piores");
   const obrasProgresso = useDashboardObras({ sort });
   const cartoesQuery = useMeusCartoes();
@@ -44,6 +47,12 @@ export default function DashboardObras() {
   const cartoes = cartoesQuery.data ?? [];
   const resumoCartoes = useMemo(() => resumirMeusCartoes(cartoes, new Date()), [cartoes]);
   const obrasAtivas = obrasProgresso.obras.length;
+
+  // Portal de Campo (system design §5.9): quem só tem vínculo em
+  // `obra_membros` (nenhum PageKey/setor) nunca vê o dashboard completo —
+  // vai direto pro shell reduzido.
+  if (carregando) return null;
+  if (restrito) return <Navigate to="/campo" replace />;
 
   return (
     <div className="p-6 lg:p-8 space-y-6">

@@ -8,7 +8,13 @@
  */
 
 /** Tipos de entidade vinculável já suportados (expansível por módulo). */
-export type EntityType = "obra" | "cronograma_item" | "usuario";
+export type EntityType =
+  | "obra"
+  | "cronograma_item"
+  | "usuario"
+  | "locacao"
+  | "patrimonio"
+  | "romaneio";
 
 export type VinculoSituacao = "ok" | "arquivada" | "quebrado";
 

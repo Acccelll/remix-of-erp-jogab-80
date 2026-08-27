@@ -5,6 +5,8 @@
  * existência da entidade, empresa, duplicidade e permissão no servidor.
  */
 import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
+import { contratoFromApi, patrimonioFromApi } from "@/contexts/app/mappers";
 import type {
   BoardExtensao,
   CardTipo,
@@ -117,6 +119,9 @@ export const cardVinculosRepo = {
     entityId: string;
     relationship?: string;
     isPrimary?: boolean;
+    /** Nome de exibição resolvido no cliente — usado no log/atividade quando
+     * a fonte é MySQL e `kanban_entidade_info` não consegue resolver nome. */
+    nomeExibicao?: string;
   }): Promise<string> {
     const { data, error } = await supabase.rpc("card_entity_link_criar", {
       p_card_id: input.cardId,
@@ -125,6 +130,7 @@ export const cardVinculosRepo = {
       p_entity_id: input.entityId,
       p_relationship_type: input.relationship ?? "relacionado",
       p_is_primary: input.isPrimary ?? false,
+      p_metadata: input.nomeExibicao ? { nome_exibicao: input.nomeExibicao } : {},
     });
     if (error) throw error;
     return data as unknown as string;
@@ -292,6 +298,110 @@ export const entidadesRepo = {
       entityType: "usuario",
       nome: (data.login as string) ?? (data.nome as string) ?? "Usuário",
       subtitulo: (data.nome as string) ?? null,
+      empresaId: null,
+    };
+  },
+
+  // Locações/Contratos e Patrimônios vivem no MySQL (api.php) — sem RLS
+  // Postgres, a rota já aplica seu próprio controle de acesso. Sem busca
+  // server-side aqui: os dois módulos são pequenos o bastante pra filtrar
+  // no cliente (mesmo padrão que `Contratos.tsx`/`Patrimonios.tsx` usam).
+  async buscarLocacoes(termo: string, limite = 20): Promise<EntidadeResumo[]> {
+    const rows = await api.getAll<Record<string, unknown>>("contratos");
+    const termoLower = termo.trim().toLowerCase();
+    return rows
+      .map(contratoFromApi)
+      .filter((c) => !termoLower || c.locacaoServico.toLowerCase().includes(termoLower))
+      .slice(0, limite)
+      .map((c) => ({
+        id: c.id,
+        entityType: "locacao" as const,
+        nome: c.locacaoServico || "Locação",
+        subtitulo: c.tipo ?? null,
+        status: c.status ?? null,
+        arquivada: !c.ativo,
+        empresaId: null,
+      }));
+  },
+
+  async locacaoPorId(id: string): Promise<EntidadeResumo | null> {
+    const row = await api.getById<Record<string, unknown>>("contratos", id).catch(() => null);
+    if (!row) return null;
+    const c = contratoFromApi(row);
+    return {
+      id: c.id,
+      entityType: "locacao",
+      nome: c.locacaoServico || "Locação",
+      subtitulo: c.tipo ?? null,
+      status: c.status ?? null,
+      arquivada: !c.ativo,
+      empresaId: null,
+    };
+  },
+
+  async buscarPatrimonios(termo: string, limite = 20): Promise<EntidadeResumo[]> {
+    const rows = await api.getAll<Record<string, unknown>>("patrimonios");
+    const termoLower = termo.trim().toLowerCase();
+    return rows
+      .map(patrimonioFromApi)
+      .filter((p) => !termoLower || p.nome.toLowerCase().includes(termoLower))
+      .slice(0, limite)
+      .map((p) => ({
+        id: p.id,
+        entityType: "patrimonio" as const,
+        nome: p.nome || "Patrimônio",
+        subtitulo: p.codigo || null,
+        arquivada: !p.ativo,
+        empresaId: null,
+      }));
+  },
+
+  async patrimonioPorId(id: string): Promise<EntidadeResumo | null> {
+    const row = await api.getById<Record<string, unknown>>("patrimonios", id).catch(() => null);
+    if (!row) return null;
+    const p = patrimonioFromApi(row);
+    return {
+      id: p.id,
+      entityType: "patrimonio",
+      nome: p.nome || "Patrimônio",
+      subtitulo: p.codigo || null,
+      arquivada: !p.ativo,
+      empresaId: null,
+    };
+  },
+
+  async buscarRomaneios(termo: string, limite = 20): Promise<EntidadeResumo[]> {
+    let q = supabase
+      .from("romaneios")
+      .select("id,numero,status,obra_destino_id")
+      .limit(limite);
+    if (termo) q = q.ilike("numero", `%${termo}%`);
+    const { data, error } = await q;
+    if (error) throw error;
+    return ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+      id: r.id as string,
+      entityType: "romaneio" as const,
+      nome: (r.numero as string) ?? "Romaneio",
+      status: (r.status as string) ?? null,
+      arquivada: r.status === "cancelado",
+      empresaId: null,
+    }));
+  },
+
+  async romaneioPorId(id: string): Promise<EntidadeResumo | null> {
+    const { data, error } = await supabase
+      .from("romaneios")
+      .select("id,numero,status,obra_destino_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return {
+      id: data.id as string,
+      entityType: "romaneio",
+      nome: (data.numero as string) ?? "Romaneio",
+      status: (data.status as string) ?? null,
+      arquivada: data.status === "cancelado",
       empresaId: null,
     };
   },

@@ -424,8 +424,6 @@ export async function importarBoardTrello(
       criado_por: autorUuid,
       data_inicio: safeDate(card.start ?? null),
       due_complete: !!card.dueComplete,
-      cover_color: coverColor,
-      cover_url: coverUrl,
       capa_cor: coverColor,
       capa_url: coverUrl,
       posicao: posicaoCard.get(card.id) ?? null,
@@ -436,7 +434,6 @@ export async function importarBoardTrello(
 
     let novoCardId: string;
     if (existingId) {
-      // TODO(ARC-001/E-01): `cards.status` é enum mas trello envia string livre; campos extras não estão no schema.
       const { error: errUpdate } = await trelloImportRepo.updateCard(existingId, cardPayload);
       if (errUpdate) {
         erros.push(`Card Sync "${card.name}": ${errUpdate.message}`);
@@ -567,7 +564,6 @@ export async function importarBoardTrello(
           avatar_url: m.avatarUrl ?? null,
         }));
       if (memRows.length > 0) {
-        // TODO(ARC-001/E-01): card_membros_externos schema não tem username/avatar_url.
         const { error } = await trelloImportRepo.insertMembrosExternos(memRows);
         if (error) erros.push(`Membros "${card.name}": ${error.message}`);
         else r.membrosExternos += memRows.length;
@@ -576,35 +572,25 @@ export async function importarBoardTrello(
 
     const cfItems = card.customFieldItems ?? [];
     if (cfItems.length > 0 && mapaCustomField.size > 0) {
-      const valores: Array<{
-        card_id: string;
-        field_id: string;
-        valor_texto: string | null;
-        valor_numero: number | null;
-        valor_data: string | null;
-        valor_bool: boolean | null;
-        valor_option: string | null;
-      }> = [];
+      const valores: Array<{ card_id: string; campo_id: string; valor: unknown }> = [];
       for (const it of cfItems) {
         const dbField = mapaCustomField.get(it.idCustomField);
         if (!dbField) continue;
         const def = cfDefs.find((f) => f.id === it.idCustomField);
-        let valor_option: string | null = null;
+        let valorOption: string | null = null;
         if (it.idValue && def?.options) {
-          valor_option = def.options.find((o) => o.id === it.idValue)?.value?.text ?? null;
+          valorOption = def.options.find((o) => o.id === it.idValue)?.value?.text ?? null;
         }
-        valores.push({
-          card_id: novoCardId,
-          field_id: dbField,
-          valor_texto: it.value?.text ?? null,
-          valor_numero: it.value?.number != null ? Number(it.value.number) : null,
-          valor_data: safeIsoTs(it.value?.date ?? null),
-          valor_bool: it.value?.checked != null ? it.value.checked === "true" : null,
-          valor_option,
-        });
+        const valor =
+          valorOption ??
+          it.value?.text ??
+          (it.value?.number != null ? Number(it.value.number) : null) ??
+          safeIsoTs(it.value?.date ?? null) ??
+          (it.value?.checked != null ? it.value.checked === "true" : null);
+        if (valor === null) continue;
+        valores.push({ card_id: novoCardId, campo_id: dbField, valor });
       }
       if (valores.length > 0) {
-        // TODO(ARC-001/E-01): card_custom_field_valores schema usa `campo_id`+`valor`; código usa `field_id`+valor_*.
         const { error } = await trelloImportRepo.insertCustomFieldValores(valores);
         if (error) erros.push(`Custom fields "${card.name}": ${error.message}`);
         else r.customFieldValores += valores.length;
