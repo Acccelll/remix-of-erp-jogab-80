@@ -56,8 +56,6 @@ type MissingTables =
   | "financeiro_matriz_rateios"
   | "alcadas_aprovacao"
   // Ponto / frota
-  | "ponto_registros"
-  | "ponto_importacoes"
   | "frota_abastecimentos"
   | "frota_manutencoes"
   // Localização / infra

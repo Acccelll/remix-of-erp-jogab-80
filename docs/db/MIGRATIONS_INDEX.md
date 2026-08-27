@@ -3,7 +3,7 @@
 > Auto-gerado por `scripts/db/gen-migrations-index.py` (DB-003 · Onda 1).
 > Regeração: `python3 scripts/db/gen-migrations-index.py`.
 
-Total: **277** migrations · janela: 2026-04-02 11:38 → 2026-08-27 11:17
+Total: **278** migrations · janela: 2026-04-02 11:38 → 2026-08-27 11:40
 
 | # | Data/Hora | Arquivo | Ementa (primeira linha) |
 |--:|-----------|---------|-------------------------|
@@ -284,3 +284,4 @@ Total: **277** migrations · janela: 2026-04-02 11:38 → 2026-08-27 11:17
 | 275 | 2026-08-18 17:36 | `20260818173634_646c20a5-418e-4454-b65e-67f4c1b69e70.sql` | Restringe o bucket privado 'cnab' (arquivos de remessa/retorno bancário) a |
 | 276 | 2026-08-18 19:50 | `20260818195031_85ea9b4a-beb1-418a-b6c0-e25f07dfe70b.sql` | Corrige `fn_lancamento_solicitacao_aprovada`: o parâmetro `p_solicitacao_id` |
 | 277 | 2026-08-27 11:17 | `20260827111725_6a6bf988-4e55-475b-9db9-0f0f61db5e9c.sql` | Fecha a dualidade de "Feature Flags" do documento de system design — com |
+| 278 | 2026-08-27 11:40 | `20260827114038_4c3dd166-4e5c-41fa-8bc0-ab07fde0f9af.sql` | Limpeza de schema morto (system design §4.2): 15 tabelas + 1 função Postgres |
