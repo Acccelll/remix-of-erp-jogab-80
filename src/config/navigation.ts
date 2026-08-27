@@ -301,7 +301,7 @@ export const NAV_REGISTRY: NavGroup[] = [
         label: "Contratos",
         icon: FileSignature,
         permission: "contratos",
-        keywords: ["quadro", "lista", "gestao"],
+        keywords: ["quadro", "lista", "gestao", "locacao", "fornecimento", "medicao"],
       },
       {
         to: "/logistica-ativos",
@@ -641,11 +641,13 @@ export const HIDDEN_NAV_ITEMS: NavItem[] = [
     permission: "financeiro",
   },
 
-  // Contratos / Patrimônios — abas dos respectivos hubs
-  { to: "/contratos/lista", label: "Contratos — Lista", icon: Files, permission: "contratos" },
+  // Contratos (locação de equipamento/serviço — distinto de "Contratos de
+  // Fornecimento", que só existe como aba do hub, sem rota própria) /
+  // Patrimônios — abas dos respectivos hubs
+  { to: "/contratos/lista", label: "Locações — Lista", icon: Files, permission: "contratos" },
   {
     to: "/quadro-contratos",
-    label: "Contratos — Quadro",
+    label: "Locações — Quadro",
     icon: FileSignature,
     permission: "contratos",
   },
@@ -764,7 +766,7 @@ export const ROUTE_LABELS: Record<string, string> = (() => {
     analise: "Análise",
     "homem-hora": "Homem-Hora",
     contratos: "Contratos",
-    "quadro-contratos": "Quadro de Contratos",
+    "quadro-contratos": "Quadro de Locações",
     empresas: "Empresas",
     colaboradores: "Colaboradores",
     funcoes: "Funções",
