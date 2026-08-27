@@ -59,7 +59,7 @@ export default function GMCutoverIndex() {
     queryKey: ["cutover-index-flags"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("feature_flags")
+        .from("cutover_legacy_flags")
         .select("flag_key, obra_id, enabled")
         .in("flag_key", LEGACY_FLAGS as unknown as string[]);
       if (error) throw error;

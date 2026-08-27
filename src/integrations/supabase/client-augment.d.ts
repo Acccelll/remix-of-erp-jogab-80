@@ -64,7 +64,7 @@ type MissingTables =
   | "obra_localizacoes"
   | "user_setores"
   // Cross-cutting
-  | "feature_flags"
+  | "cutover_legacy_flags"
   | "import_validation_runs"
   | "system_events"
   | "security_events"
@@ -95,7 +95,6 @@ type MissingRpcs =
   | "fn_importar_relatorio_totvs"
   | "fn_inspecao_materializar_pendentes"
   | "fn_oc_aprovar"
-  | "is_flag_enabled"
   | "rdo_upsert_from_checklist"
   | "salvar_nf_atomica";
 
