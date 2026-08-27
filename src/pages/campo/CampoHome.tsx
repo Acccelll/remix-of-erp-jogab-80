@@ -72,14 +72,14 @@ export default function CampoHome() {
             <Tile
               icon={CalendarRange}
               titulo="Ver cronograma"
-              descricao="Em breve"
-              disabled
+              descricao="Atividades da obra"
+              onClick={() => navigate(`/campo/cronograma?obra=${obraAtual.id}`)}
             />
             <Tile
               icon={ClipboardList}
               titulo="Requisitar material"
-              descricao="Em breve"
-              disabled
+              descricao="Pedido pro almoxarifado"
+              onClick={() => navigate(`/campo/requisicao?obra=${obraAtual.id}`)}
             />
           </div>
         </>

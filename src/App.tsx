@@ -24,6 +24,8 @@ const DashboardObras = lazy(() => import("@/pages/obras/DashboardObras"));
 const CampoLayout = lazy(() => import("@/pages/campo/CampoLayout"));
 const CampoHome = lazy(() => import("@/pages/campo/CampoHome"));
 const CampoRdo = lazy(() => import("@/pages/campo/CampoRdo"));
+const CampoCronograma = lazy(() => import("@/pages/campo/CampoCronograma"));
+const CampoRequisicao = lazy(() => import("@/pages/campo/CampoRequisicao"));
 const Histograma = lazy(() => import("@/pages/obras/Histograma"));
 const Colaboradores = lazy(() => import("@/pages/rh/Colaboradores"));
 const LogisticaColaboradores = lazy(() => import("@/pages/rh/LogisticaColaboradores"));
@@ -368,6 +370,8 @@ const ProtectedRoutes = () => {
       <Route path="/campo" element={<CampoLayout />}>
         <Route index element={<CampoHome />} />
         <Route path="rdo" element={<CampoRdo />} />
+        <Route path="cronograma" element={<CampoCronograma />} />
+        <Route path="requisicao" element={<CampoRequisicao />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

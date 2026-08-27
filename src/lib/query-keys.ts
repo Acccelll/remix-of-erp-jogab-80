@@ -50,6 +50,7 @@ export const registeredQueryKeyRoots = [
   "breadcrumb-board",
   "breadcrumb-modelo",
   "breadcrumb-obra",
+  "campo-cronograma",
   "campo-obra-membros-atual",
   "card",
   "card-anexos",
