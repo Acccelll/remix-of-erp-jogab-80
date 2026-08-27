@@ -52,7 +52,7 @@ const CARD_SETORES_COLS = "card_id, setor, created_at";
 const CARD_RECURSOS_COLS =
   "id, card_id, tipo_recurso, prazo_notif_compras, prazo_pedido, prazo_prod_iniciar, prazo_notif_producao, data_necessidade_obra, created_at, updated_at";
 const CARDS_FULL_COLS =
-  "id, numero, tipo, titulo, descricao, status, obra_id, responsavel_id, criado_por, data_inicio, prazo, lembrete, due_complete, arquivado, posicao, capa_cor, capa_url, cover_color, cover_url, cronograma_item_id, grupo_negociacao_id, origem_externa, origem_id, origem_url, created_at, updated_at";
+  "id, numero, tipo, titulo, descricao, status, obra_id, responsavel_id, criado_por, data_inicio, prazo, lembrete, due_complete, arquivado, posicao, capa_cor, capa_url, cronograma_item_id, grupo_negociacao_id, origem_externa, origem_id, origem_url, created_at, updated_at";
 
 // ----- card_checklist_itens -----
 export const cardChecklistItensRepo = {

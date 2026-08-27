@@ -16,7 +16,7 @@ export const cardsRepo = {
       await supabase
         .from("cards")
         .select(
-          "id, numero, tipo, titulo, descricao, status, obra_id, responsavel_id, criado_por, data_inicio, prazo, lembrete, due_complete, arquivado, posicao, capa_cor, capa_url, cover_color, cover_url, cronograma_item_id, grupo_negociacao_id, origem_externa, origem_id, origem_url, created_at, updated_at",
+          "id, numero, tipo, titulo, descricao, status, obra_id, responsavel_id, criado_por, data_inicio, prazo, lembrete, due_complete, arquivado, posicao, capa_cor, capa_url, cronograma_item_id, grupo_negociacao_id, origem_externa, origem_id, origem_url, created_at, updated_at",
         )
         .eq("id", id)
         .single(),
