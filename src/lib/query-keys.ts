@@ -219,6 +219,8 @@ export const registeredQueryKeyRoots = [
   "obra",
   "obra-contrato-info",
   "obra-membership",
+  "obra-membros",
+  "obra-membros-busca-usuarios",
   "obra_cc",
   "obra_localizacoes",
   "obra_valores",

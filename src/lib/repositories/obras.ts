@@ -254,4 +254,53 @@ export const obraMembrosRepo = {
     if (error) throw error;
     return (data?.papel as string | undefined) ?? null;
   },
+
+  /**
+   * Membros de uma obra, com login/nome resolvidos via `profiles` (RLS: GM
+   * ou o próprio). Duas consultas, não um embed: `obra_membros.user_id`
+   * referencia `auth.users(id)`, não `public.profiles(id)` — PostgREST não
+   * tem FK pra inferir o join automático de `profiles:user_id(...)`.
+   */
+  async listByObra(obraId: string): Promise<
+    Array<{ user_id: string; papel: string; created_at: string; login: string | null; nome: string | null }>
+  > {
+    const { data: membros, error } = await supabase
+      .from("obra_membros")
+      .select("user_id,papel,created_at")
+      .eq("obra_id", obraId)
+      .order("created_at");
+    if (error) throw error;
+    const ids = (membros ?? []).map((m: any) => m.user_id as string);
+    if (ids.length === 0) return [];
+    const { data: perfis, error: errPerfis } = await supabase
+      .from("profiles")
+      .select("id,login,nome")
+      .in("id", ids);
+    if (errPerfis) throw errPerfis;
+    const porId = new Map((perfis ?? []).map((p: any) => [p.id as string, p]));
+    return (membros ?? []).map((m: any) => ({
+      user_id: m.user_id,
+      papel: m.papel,
+      created_at: m.created_at,
+      login: (porId.get(m.user_id)?.login as string | undefined) ?? null,
+      nome: (porId.get(m.user_id)?.nome as string | undefined) ?? null,
+    }));
+  },
+
+  /** Escrita restrita a GM pela RLS ("obra_membros write gm"). */
+  async add(obraId: string, userId: string, papel: "gestor" | "membro" | "observador" = "membro") {
+    const { error } = await supabase
+      .from("obra_membros")
+      .upsert({ obra_id: obraId, user_id: userId, papel }, { onConflict: "user_id,obra_id" });
+    if (error) throw error;
+  },
+
+  async remove(obraId: string, userId: string) {
+    const { error } = await supabase
+      .from("obra_membros")
+      .delete()
+      .eq("obra_id", obraId)
+      .eq("user_id", userId);
+    if (error) throw error;
+  },
 };
