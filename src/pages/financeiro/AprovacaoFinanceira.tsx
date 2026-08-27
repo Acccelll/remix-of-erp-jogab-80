@@ -716,8 +716,11 @@ const AprovacaoFinanceira = () => {
         },
       });
 
-      // Cria também a "despesa prevista" no Fluxo de Dívidas (origem=sistema).
-      // Falha aqui não invalida a aprovação — apenas registra warning.
+      // Cria também a "previsão" no Fluxo de Dívidas / Previsão de Pagamento
+      // (origem=sistema). Falha aqui não invalida a aprovação (a despesa
+      // MySQL acima já foi criada) — mas agora avisa na tela, não só no
+      // console: essa gravação já ficou quebrada e silenciosa uma vez
+      // (p_solicitacao_id era uuid, id real é numérico) sem ninguém notar.
       try {
         const { error: rpcErr } = await supabase.rpc("fn_lancamento_solicitacao_aprovada", {
           p_solicitacao_id: s.id,
@@ -727,9 +730,15 @@ const AprovacaoFinanceira = () => {
           p_data_prevista: s.data_pagamento || new Date().toISOString().slice(0, 10),
           p_descricao: s.referencia || `Solicitação #${s.id}`,
         });
-        if (rpcErr) logger.warn("fn_lancamento_solicitacao_aprovada falhou", rpcErr);
+        if (rpcErr) {
+          logger.warn("fn_lancamento_solicitacao_aprovada falhou", rpcErr);
+          toast.warning("Aprovada, mas a previsão no Fluxo de Dívidas não foi criada", {
+            description: rpcErr.message,
+          });
+        }
       } catch (err) {
         logger.warn("fn_lancamento_solicitacao_aprovada exceção", err as any);
+        toast.warning("Aprovada, mas a previsão no Fluxo de Dívidas não foi criada");
       }
 
       toast.success("Solicitação aprovada", { description: "Despesa criada automaticamente." });

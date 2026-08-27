@@ -12,6 +12,7 @@ entre bancos/schemas e quais são **espelhos read-only**.
 | Colaborador | `public.colaboradores`             | `public.players`             | **nenhuma** — sincronização derivada   |
 | Obra        | `public.obras`                     | `public.centros_custo_totvs` | somente import TOTVS (service_role)    |
 | Cliente     | `public.clientes` (Postgres)       | `clientes` (MySQL)           | **nenhuma hoje** — ver nota abaixo     |
+| Aprovação Financeira | `solicitacoesFinanceiras` (MySQL, via `api.php`) | `public.solicitacoes_financeiras` | **nenhuma** — congelada, ver nota abaixo |
 
 > **Cliente — ciclo "fechado → reaberto" (registrado em 2026-08-18).**
 > Cliente já foi um módulo fechado no MySQL — a tabela `clientes` de lá tem
@@ -63,6 +64,25 @@ entre bancos/schemas e quais são **espelhos read-only**.
 >
 > **Veículo é o único que ainda não migrou:** `VeiculoHistoricoSection` segue
 > derivando períodos por regex sobre a descrição, com período-base sintético.
+
+> **Aprovação Financeira — fechada e congelada (2026-08-18).** A Aprovação
+> Financeira sempre rodou de fato 100% em MySQL (rota `solicitacoesFinanceiras`
+> de `api.php`, consumida via `src/hooks/financeiro/useSolicitacoesFinanceiras.ts`)
+> desde antes desta entrada existir na matriz — nunca havia sido documentada.
+> A tabela Postgres homônima (`public.solicitacoes_financeiras`) só existia
+> como resíduo de uma versão anterior: sem nenhum caminho de escrita no
+> frontend (confirmado por grep — o único uso restante é leitura, em
+> `financeiro.ts:listCarrinhoSolicitacoesAoVivo`), mas com RLS ainda permitindo
+> `INSERT`/`UPDATE` de `authenticated`.
+>
+> Ao fechar esta entrada (mesma migration que corrigiu `fn_lancamento_
+> solicitacao_aprovada`, que gravava `solicitacao_id` como `uuid` — sempre
+> falhava para ids reais, numéricos, do MySQL — ver histórico de migrations
+> de 2026-08-18), a tabela Postgres foi **congelada de verdade**, não só
+> declarada: `REVOKE INSERT, UPDATE, DELETE ON public.solicitacoes_financeiras
+> FROM authenticated, anon` já aplicado, ao contrário do enforcement "previsto"
+> descrito mais abaixo para `players`/`centros_custo_totvs`. Só resta `SELECT`,
+> para o caminho de leitura legado do carrinho continuar funcionando.
 
 ## Regras derivadas (contrato)
 
