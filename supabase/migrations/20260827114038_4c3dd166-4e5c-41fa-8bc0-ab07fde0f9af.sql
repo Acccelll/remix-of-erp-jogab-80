@@ -1,4 +1,4 @@
--- Limpeza de schema morto (system design §4.2): 15 tabelas + 1 função Postgres
+-- Limpeza de schema morto (system design §4.2): 14 tabelas + 1 função Postgres
 -- cujo domínio (Colaborador/DP/Ponto/Frotas/Patrimônios) já fechou e roda 100%
 -- em MySQL via api.php, sem nenhum caminho de escrita Postgres restante
 -- (confirmado por grep: zero INSERT/UPDATE nas migrations e zero
@@ -6,12 +6,21 @@
 -- "Colaborador" já documenta que o domínio roda no MySQL e que as tabelas
 -- espelho Postgres não devem ganhar novos leitores.
 --
--- Pré-requisito descoberto na investigação: 3 tabelas VIVAS têm FK apontando
--- para dentro deste conjunto morto (colaboradores/patrimonios/players).
--- Nenhuma delas é uma dualidade real — são referências soltas que, no
--- desenho atual do projeto, cruzam a fronteira Postgres/MySQL sem FK
--- declarada (mesmo padrão já aceito para Cliente, ver CANONICIDADE.md). Por
--- isso essas FKs são soltas aqui, não as tabelas donas:
+-- ✎ Correção (mesma execução): `players` estava na lista original de 15 —
+-- a verificação de frontend/migrations de dado não achou nada, mas não
+-- checou funções `SECURITY DEFINER` server-side. `players` é a fonte real
+-- de `is_current_player_gm()`/`current_player_has_access()` (RBAC de toda a
+-- aplicação, 9+ funções em migrations recentes, incluindo as RPCs de Kanban
+-- desta mesma sessão) — tabela viva e crítica, não um mirror morto. Retirada
+-- do corte; a FK solta de `leads.prospectado_por` também foi revertida (não
+-- havia motivo pra soltá-la além de viabilizar esse drop).
+--
+-- Pré-requisito descoberto na investigação: 2 tabelas VIVAS têm FK apontando
+-- para dentro deste conjunto morto (colaboradores/patrimonios). Nenhuma
+-- delas é uma dualidade real — são referências soltas que, no desenho atual
+-- do projeto, cruzam a fronteira Postgres/MySQL sem FK declarada (mesmo
+-- padrão já aceito para Cliente, ver CANONICIDADE.md). Por isso essas FKs
+-- são soltas aqui, não as tabelas donas:
 --   - rdo_efetivo.colaborador_id       (RDO é módulo ativo; a lista de
 --     colaboradores já vem do MySQL via rota `mobilizacoesPeriodos` — a FK
 --     para a tabela congelada só arriscava falha ao marcar presença de
@@ -22,7 +31,13 @@
 --   - custo_colaborador_competencia.colaborador_id (tabela nunca recebeu
 --     escrita; alimenta hoje 2 hooks que sempre retornam vazio — achado
 --     registrado para investigação futura, fora do escopo deste corte)
--- e leads.prospectado_por → players (coluna sem nenhum uso no frontend).
+--
+-- Segundo achado da mesma correção: a RLS de `responsabilidades_patrimonios`
+-- (migration 20260701203807) tem um branch de leitura que faz `EXISTS
+-- (SELECT 1 FROM public.patrimonios ...)` — quebraria (relação inexistente)
+-- pra qualquer usuário não-GM/RH assim que `patrimonios` caísse. Política
+-- substituída abaixo por uma versão sem esse branch (só estreita acesso,
+-- não concede nada novo — o branch dependia de um mirror já congelado).
 
 -- 1) Solta as FKs vindas de tabelas vivas para dentro do conjunto morto.
 DO $$
@@ -34,13 +49,6 @@ BEGIN
   IF con IS NOT NULL THEN
     EXECUTE format('ALTER TABLE public.rdo_efetivo DROP CONSTRAINT %I', con);
   END IF;
-
-  SELECT conname INTO con FROM pg_constraint
-    WHERE conrelid = 'public.leads'::regclass
-      AND confrelid = 'public.players'::regclass AND contype = 'f';
-  IF con IS NOT NULL THEN
-    EXECUTE format('ALTER TABLE public.leads DROP CONSTRAINT %I', con);
-  END IF;
 END $$;
 
 ALTER TABLE public.responsabilidades_patrimonios
@@ -49,6 +57,18 @@ ALTER TABLE public.responsabilidades_patrimonios
 
 ALTER TABLE public.custo_colaborador_competencia
   DROP CONSTRAINT IF EXISTS fk_custo_colab_colaborador;
+
+-- 1b) Remove o branch de `responsabilidades_patrimonios` que dependia de
+-- `patrimonios` (ver ✎ acima) antes de derrubar a tabela.
+DROP POLICY IF EXISTS "responsabilidades_patrimonios read por patrimonio ou rh" ON public.responsabilidades_patrimonios;
+CREATE POLICY "responsabilidades_patrimonios read gm ou rh"
+ON public.responsabilidades_patrimonios
+FOR SELECT
+TO authenticated
+USING (
+  public.current_is_gm()
+  OR public.current_has_setor('RH')
+);
 
 -- 2) `vw_homem_hora_mensal` não tem nenhum consumidor no frontend — cai.
 DROP VIEW IF EXISTS public.vw_homem_hora_mensal;
@@ -86,7 +106,6 @@ DROP TABLE IF EXISTS public.provisoes;
 DROP TABLE IF EXISTS public.patrimonios;
 DROP TABLE IF EXISTS public.veiculos;
 DROP TABLE IF EXISTS public.colaboradores;
-DROP TABLE IF EXISTS public.players;
 
 -- 5) RPC morta (folha rateada por colaborador/obra) — sem consumidor no
 -- frontend, dependia de `colaboradores`/`historico_salarial`, já removidas.
